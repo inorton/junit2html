@@ -1,0 +1,19 @@
+junit2html by Ian Norton <inorton@gmail.com>
+-------------------------------------------------------------
+
+This is a simple self-contained python tool to
+produce a single html file from a single junit xml file.
+
+Usage:
+
+$ junit2html JUNIT_XML_FILE [NEW_HTML_FILE]
+
+eg:
+
+$ junit2html pytest-results.xml testrun.html
+
+
+Installation
+------------
+
+$ sudo python setup.py install

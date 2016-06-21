@@ -1,0 +1,417 @@
+"""
+Parse a junit report file into a family of objects
+"""
+
+import xml.etree.ElementTree as ET
+import collections
+import tag
+import os
+import uuid
+
+
+class AnchorBase(object):
+    """
+    Base class that can generate a unique anchor name.
+    """
+    def __init__(self):
+        self._anchor = None
+
+    def anchor(self):
+        """
+        Generate a html anchor name
+        :return:
+        """
+        if not self._anchor:
+            self._anchor = str(uuid.uuid4())
+        return self._anchor
+
+
+class Class(AnchorBase):
+    """
+    A namespace for a test
+    """
+    def __init__(self):
+        super(Class, self).__init__()
+        self.name = None
+        self.cases = list()
+
+    def html(self):
+        """
+        Render this test class as html
+        :return:
+        """
+        cases = [x.html() for x in self.cases]
+
+        return """
+        <hr size="2"/>
+        <a name="{anchor}">
+        <div class="testclass">
+            <div>Test Class: {name}</div>
+            <div class="testcases">
+            {cases}
+            </div>
+        </div>
+        </a>
+        """.format(anchor=self.anchor(),
+                   name=tag.text(self.name),
+                   count=len(cases),
+                   cases="".join(cases))
+
+
+class Case(AnchorBase):
+    """
+    Test cases
+    """
+    def __init__(self):
+        super(Case, self).__init__()
+        self.failure = None
+        self.failure_msg = None
+        self.skipped = False
+        self.skipped_msg = None
+        self.stderr = None
+        self.stdout = None
+        self.duration = 0
+        self.name = None
+        self.testclass = None
+
+    def failed(self):
+        """
+        Return True if this test failed
+        :return:
+        """
+        return self.failure is not None
+
+    def html(self):
+        """
+        Render this test case as HTML
+        :return:
+        """
+        failure = ""
+        skipped = None
+        stdout = tag.text(self.stdout)
+        stderr = tag.text(self.stderr)
+
+        if self.skipped:
+            skipped = """
+            <hr size="1"/>
+            <div class="skipped"><b>Skipped: {msg}</b><br/>
+                <pre>{skip}</pre>
+            </div>
+            """.format(msg=tag.text(self.skipped_msg),
+                       skip=tag.text(self.skipped))
+
+        if self.failed():
+            failure = """
+            <hr size="1"/>
+            <div class="failure"><b>Failed: {msg}</b><br/>
+                <pre>{fail}</pre>
+            </div>
+            """.format(msg=tag.text(self.failure_msg),
+                       fail=tag.text(self.failure))
+
+        return """
+    <a name="{anchor}">
+        <div class="testcase">
+            <div class="details">
+                <span class="testname"><b>{testname}</b></span><br/>
+                <span class="testclassname">{testclassname}</span><br/>
+                <span class="duration">Time Taken: {duration}s</span>
+            </div>
+            {skipped}
+            {failure}
+            <hr size="1"/>
+            <div class="stdout"><i>Stdout</i><br/>
+                <pre>{stdout}</pre></div>
+            <hr size="1"/>
+            <div class="stderr"><i>Stderr</i><br/>
+                <pre>{stderr}</pre></div>
+        </div>
+    </a>
+        """.format(anchor=self.anchor(),
+                   testname=self.name,
+                   testclassname=self.testclass.name,
+                   duration=self.duration,
+                   failure=failure,
+                   skipped=skipped,
+                   stdout=stdout,
+                   stderr=stderr)
+
+
+class Suite(object):
+    """
+    Contains test cases (usually only one suite per report)
+    """
+    def __init__(self):
+        self.name = None
+        self.duration = 0
+        self.classes = collections.OrderedDict()
+
+    def __contains__(self, item):
+        """
+        Return True if the given test classname is part of this test suite
+        :param item:
+        :return:
+        """
+        return item in self.classes
+
+    def __getitem__(self, item):
+        """
+        Return the given test class object
+        :param item:
+        :return:
+        """
+        return self.classes[item]
+
+    def __setitem__(self, key, value):
+        """
+        Add a test class
+        :param key:
+        :param value:
+        :return:
+        """
+        self.classes[key] = value
+
+    def all(self):
+        """
+        Return all testcases
+        :return:
+        """
+        tests = list()
+        for testclass in self.classes:
+            tests.extend(self.classes[testclass].cases)
+        return tests
+
+    def failed(self):
+        """
+        Return all the failed testcases
+        :return:
+        """
+        return [test for test in self.all() if test.failed()]
+
+    def skipped(self):
+        """
+        Return all skipped testcases
+        :return:
+        """
+        return [test for test in self.all() if test.skipped]
+
+    def passed(self):
+        """
+        Return all the passing testcases
+        :return:
+        """
+        return [test for test in self.all() if not test.failed()]
+
+    def toc(self):
+        """
+        Return a html table of contents
+        :return:
+        """
+        fails = ""
+
+        if len(self.failed()):
+            faillist = list()
+            for failure in self.failed():
+                faillist.append(
+                    """
+                    <li>
+                        <a href="#{anchor}">{name}</a>
+                    </li>
+                    """.format(anchor=failure.anchor(),
+                               name=tag.text(
+                                   failure.testclass.name + failure.name)))
+
+            fails = """
+            <li>Failures
+            <ul>{faillist}</ul>
+            </li>
+            """.format(faillist="".join(faillist))
+
+        if len(self.skipped()):
+            skiplist = list()
+            for skipped in self.skipped():
+                skiplist.append(
+                    """
+                    <li>
+                        <a href="#{anchor}">{name}</a>
+                    </li>
+                    """.format(anchor=skipped.anchor(),
+                               name=tag.text(
+                                   skipped.testclass.name + skipped.name)))
+
+            skips = """
+            <li>Skipped
+            <ul>{skiplist}</ul>
+            </li>
+            """.format(skiplist="".join(skiplist))
+
+        classlist = list()
+        for classname in self.classes:
+            testclass = self.classes[classname]
+
+            cases = list()
+            for testcase in testclass.cases:
+                if "pkcs11" in testcase.name:
+                    assert True
+
+                cases.append(
+                    """
+                    <li>
+                        <a href="#{anchor}">{name}</a>
+                    </li>
+                    """.format(anchor=testcase.anchor(),
+                               name=tag.text(testcase.name)))
+
+            classlist.append("""
+            <li>
+                <a href="#{anchor}">{name}</a>
+                <ul>
+                {cases}
+                </ul>
+            </li>
+            """.format(anchor=testclass.anchor(),
+                       name=testclass.name,
+                       cases="".join(cases)))
+
+        return """
+        <ul>
+            {failed}
+            {skips}
+            <li>All Test Classes
+            <ul>{classlist}</ul>
+            </li>
+        </ul>
+        """.format(failed=fails,
+                   skips=skips,
+                   classlist="".join(classlist))
+
+    def html(self):
+        """
+        Render this as html.
+        :return:
+        """
+        classes = list()
+
+        for classname in self.classes:
+            classes.append(self.classes[classname].html())
+
+        return """
+        <div class="testsuite">
+            <h2>Test Suite: {name}</h2>
+            <table>
+            <tr><th align="left">Duration</th><td align="right">{duration} sec</td></tr>
+            <tr><th align="left">Test Cases</th><td align="right">{count}</td></tr>
+            <tr><th align="left">Failures</th><td align="right">{fails}</td></tr>
+            </table>
+            <a name="toc"></a>
+            <h2>Results Index</h2>
+            {toc}
+            <hr size="2"/>
+            <h2>Test Results</h2>
+            <div class="testclasses">
+            {classes}
+            </div>
+        </div>
+        """.format(name=tag.text(self.name),
+                   duration=self.duration,
+                   toc=self.toc(),
+                   classes="".join(classes),
+                   count=len(self.all()),
+                   fails=len(self.failed()))
+
+
+class Junit(object):
+    """
+    Parse a single junit xml report
+    """
+
+    def __init__(self, filename):
+        """
+        Parse the file
+        :param filename:
+        :return:
+        """
+        self.filename = filename
+        self.tree = ET.parse(filename)
+        self.suite = None
+        self.process()
+        self.css = "report.css"
+
+    def get_css(self):
+        """
+        Return the content of the css file
+        :return:
+        """
+        thisdir = os.path.dirname(os.path.abspath(__file__))
+        with open(os.path.join(thisdir, self.css), "rb") as cssfile:
+            return cssfile.read()
+
+    def process(self):
+        """
+        populate the report from the xml
+        :return:
+        """
+        root = self.tree.getroot()
+        assert root.tag == "testsuite"
+        self.suite = Suite()
+        self.suite.name = root.attrib["name"]
+        self.suite.duration = float(root.attrib["time"])
+
+        for testcase in root:
+            assert testcase.tag == "testcase"
+            if testcase.attrib["classname"] not in self.suite:
+                testclass = Class()
+                testclass.name = testcase.attrib["classname"]
+                if not testclass.name:
+                    testclass.name = "no-classname-set"
+
+                self.suite[testclass.name] = testclass
+
+            newcase = Case()
+            newcase.name = testcase.attrib["name"]
+            newcase.testclass = testclass
+            newcase.duration = float(testcase.attrib["time"])
+            testclass.cases.append(newcase)
+
+            # does this test case have any children?
+            for child in testcase:
+                if child.tag == "skipped":
+                    newcase.skipped = child.text
+                    if "message" in child.attrib:
+                        newcase.skipped_msg = child.attrib["message"]
+                elif child.tag == "system-out":
+                    newcase.stdout = child.text
+                elif child.tag == "system-err":
+                    newcase.stderr = child.text
+                elif child.tag == "failure":
+                    newcase.failure = child.text
+                    if "message" in child.attrib:
+                        newcase.failure_msg = child.attrib["message"]
+                elif child.tag == "error":
+                    newcase.failure = child.text
+                    if "message" in child.attrib:
+                        newcase.failure_msg = child.attrib["message"]
+
+    def html(self):
+        """
+        Render the test suite as a HTML report with links to errors first.
+        :return:
+        """
+        cssdata = self.get_css()
+
+        return """
+        <html>
+        <head>
+            <title>{name} - Junit Test Report</title>
+            <style type="text/css">
+              {css}
+            </style>
+        </head>
+        <body>
+        <h1>Test Report</h1>
+        {suite}
+        </body>
+        </html>
+        """.format(name=self.suite.name,
+                   css=cssdata,
+                   suite=self.suite.html())

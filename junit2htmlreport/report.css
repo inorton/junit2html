@@ -1,0 +1,49 @@
+h1 {
+    font-family: sans-serif;
+}
+h2 {
+    font-family: sans-serif;
+}
+
+li > a {
+    font-family: monospace;
+}
+
+.testclass > div {
+    padding-left: 1em;
+}
+
+.testclass > a > div {
+    font-size: 1.3em;
+    font-family: sans-serif;
+}
+
+.testcase > div {
+    border-left: 3px solid black;
+    padding-left: 1em;
+}
+
+.testcase pre {
+    display: block;
+    padding: 4px;
+    margin-right: 1em;
+    background-color: #121212;
+    color: #dedede;
+    white-space: pre-wrap;
+}
+
+.testcase .details b {
+    font-size: 1.2em;
+}
+
+.stdout, .stderr {
+    margin-left: 1em;
+}
+
+.skipped {
+    background-color: #eeee00;
+}
+
+.failure {
+    background-color: #eeaaaa;
+}

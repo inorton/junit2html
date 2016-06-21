@@ -1,0 +1,4 @@
+#!/usr/bin/python
+
+from junit2htmlreport import runner
+runner.start()

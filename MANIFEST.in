@@ -1,0 +1,2 @@
+include junit2html README
+recursive-include junit2htmlreport/* junit2html
