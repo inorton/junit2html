@@ -5,4 +5,4 @@ python:
 install:
   - python setup.py install
 
-script: python -m pytest tests
+script: python -m pytest junit2htmlreport
