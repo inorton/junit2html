@@ -17,3 +17,14 @@ Installation
 ------------
 
 $ sudo python setup.py install
+
+About Junit
+-----------
+
+Junit is a widely used java test framework, it happens to produce a fairly
+generic formatted test report and many non-java things produce the same files
+(eg py.test) or can be converted quite easily to junit xml (cunit reports via 
+xslt). The report files are understood by many things like Jenkins and various
+ IDEs.
+
+The format of junit files is described here: http://llg.cubic.org/docs/junit/
