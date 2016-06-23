@@ -7,7 +7,7 @@ import sys
 from junit2htmlreport import parser
 
 
-USAGE = "usage: %prog JUNTI_XML_REPORT [OUTFILE.html]"
+USAGE = "usage: %prog JUNIT_XML_REPORT [OUTFILE.html]"
 PARSER = OptionParser(usage=USAGE, prog="junit2html")
 
 
