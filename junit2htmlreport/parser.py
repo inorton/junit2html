@@ -356,7 +356,7 @@ class Junit(object):
         assert root.tag == "testsuite"
         self.suite = Suite()
         self.suite.name = root.attrib["name"]
-        self.suite.duration = float(root.attrib["time"])
+        self.suite.duration = float(root.attrib.get("time", '0'))
 
         for testcase in root:
             assert testcase.tag == "testcase"
