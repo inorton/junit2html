@@ -208,6 +208,7 @@ class Suite(object):
         :return:
         """
         fails = ""
+        skips = ""
 
         if len(self.failed()):
             faillist = list()
