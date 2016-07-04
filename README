@@ -28,3 +28,8 @@ xslt). The report files are understood by many things like Jenkins and various
  IDEs.
 
 The format of junit files is described here: http://llg.cubic.org/docs/junit/
+
+Testing
+-------
+
+Junit2html is kindly tested on Travis : https://travis-ci.org/inorton/junit2html
