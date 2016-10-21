@@ -57,6 +57,24 @@ class Class(AnchorBase):
                    count=len(cases),
                    cases="".join(cases))
 
+class Property(AnchorBase):
+    """
+    Test Properties
+    """
+    def _init_(self):
+        super(Property, self).__init__()
+        self.name=None
+        self.value=None
+
+    def html(self):
+        """
+       Render those properties as html
+       :return:
+       """
+        return """
+        <div class="property"><i>{name}</i><br/>
+        <pre>{value}</pre></div>
+        """.format(name=tag.text(self.name), value=tag.text(self.value))
 
 class Case(AnchorBase):
     """
@@ -73,6 +91,7 @@ class Case(AnchorBase):
         self.duration = 0
         self.name = None
         self.testclass = None
+        self.properties = list()
 
     def failed(self):
         """
@@ -109,6 +128,8 @@ class Case(AnchorBase):
             """.format(msg=tag.text(self.failure_msg),
                        fail=tag.text(self.failure))
 
+        properties = [x.html() for x in self.properties]
+
         return """
     <a name="{anchor}">
         <div class="testcase">
@@ -120,6 +141,7 @@ class Case(AnchorBase):
             {skipped}
             {failure}
             <hr size="1"/>
+            {properties}
             <div class="stdout"><i>Stdout</i><br/>
                 <pre>{stdout}</pre></div>
             <hr size="1"/>
@@ -133,6 +155,7 @@ class Case(AnchorBase):
                    duration=self.duration,
                    failure=failure,
                    skipped=skipped,
+                   properties="".join(properties),
                    stdout=stdout,
                    stderr=stderr)
 
@@ -392,6 +415,12 @@ class Junit(object):
                     newcase.failure = child.text
                     if "message" in child.attrib:
                         newcase.failure_msg = child.attrib["message"]
+                elif child.tag == "properties":
+                    for property in child:
+                        newproperty = Property()
+                        newproperty.name = property.attrib["name"]
+                        newproperty.value = property.attrib["value"]
+                        newcase.properties.append(newproperty)
 
     def html(self):
         """
