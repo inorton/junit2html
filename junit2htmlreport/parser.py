@@ -4,7 +4,7 @@ Parse a junit report file into a family of objects
 
 import xml.etree.ElementTree as ET
 import collections
-import tag
+from junit2htmlreport import tag
 import os
 import uuid
 
