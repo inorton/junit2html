@@ -2,7 +2,7 @@
 Test that does nothing other than import
 """
 import os
-from junit2htmlreport.tests.inputfiles import get_filepath
+from inputfiles import get_filepath
 from junit2htmlreport import runner, parser
 
 
