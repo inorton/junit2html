@@ -360,17 +360,31 @@ class Junit(object):
     Parse a single junit xml report
     """
 
-    def __init__(self, filename):
+    def __init__(self, filename=None, xmlstring=None):
         """
         Parse the file
         :param filename:
         :return:
         """
         self.filename = filename
-        self.tree = ET.parse(filename)
+        self.tree = None
+        if filename is not None:
+            self.tree = ET.parse(filename)
+        elif xmlstring is not None:
+            self._read(xmlstring)
+        else:
+            raise ValueError("Missing any filename or xmlstring")
         self.suites = []
         self.process()
         self.css = "report.css"
+
+    def _read(self, xmlstring):
+        """
+        Populate the junit xml document tree from a string
+        :param xmlstring:
+        :return:
+        """
+        self.tree = ET.fromstring(xmlstring)
 
     def get_css(self):
         """
