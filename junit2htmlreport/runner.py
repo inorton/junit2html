@@ -17,7 +17,7 @@ def run(args):
     :param args:
     :return:
     """
-    (opts, args) = PARSER.parse_args()
+    (opts, args) = PARSER.parse_args(args) if args else  PARSER.parse_args()
     if not len(args):
         PARSER.print_usage()
         sys.exit(1)
