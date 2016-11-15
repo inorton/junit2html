@@ -32,4 +32,6 @@ The format of junit files is described here: http://llg.cubic.org/docs/junit/
 Testing
 -------
 
-Junit2html is kindly tested on Travis : https://travis-ci.org/inorton/junit2html
+Junit2html is kindly tested on ![Travis](https://travis-ci.org/inorton/junit2html.svg?branch=master) : https://travis-ci.org/inorton/junit2html 
+
+
