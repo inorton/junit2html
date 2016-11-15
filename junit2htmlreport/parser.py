@@ -168,6 +168,7 @@ class Suite(object):
         self.name = None
         self.duration = 0
         self.classes = collections.OrderedDict()
+        self.properties = {}
 
     def __contains__(self, item):
         """
@@ -319,9 +320,18 @@ class Suite(object):
         for classname in self.classes:
             classes.append(self.classes[classname].html())
 
+        props = ""
+        if len(self.properties):
+            props += "<table>"
+            propnames = sorted(self.properties)
+            for prop in propnames:
+                props += "<tr><th>{}</th><td>{}</td></tr>".format(prop, self.properties[prop])
+            props += "</table>"
+
         return """
         <div class="testsuite">
             <h2>Test Suite: {name}</h2>
+            {properties}
             <table>
             <tr><th align="left">Duration</th><td align="right">{duration} sec</td></tr>
             <tr><th align="left">Test Cases</th><td align="right">{count}</td></tr>
@@ -339,6 +349,7 @@ class Suite(object):
         """.format(name=tag.text(self.name),
                    duration=self.duration,
                    toc=self.toc(),
+                   properties=props,
                    classes="".join(classes),
                    count=len(self.all()),
                    fails=len(self.failed()))
@@ -357,7 +368,7 @@ class Junit(object):
         """
         self.filename = filename
         self.tree = ET.parse(filename)
-        self.suite = None
+        self.suites = []
         self.process()
         self.css = "report.css"
 
@@ -376,59 +387,64 @@ class Junit(object):
         :return:
         """
         root = self.tree.getroot()
-        assert root.tag == "testsuite"
-        self.suite = Suite()
-        self.suite.name = root.attrib["name"]
-        self.suite.duration = float(root.attrib.get("time", '0'))
 
-        for testcase in root:
-            assert testcase.tag == "testcase"
-            if testcase.attrib["classname"] not in self.suite:
-                testclass = Class()
-                testclass.name = testcase.attrib["classname"]
-                if not testclass.name:
-                    testclass.name = "no-classname-set"
+        if root.tag == "testsuite":
+            suites = [root]
+        elif root.tag == "testsuites":
+            suites = [x for x in root]
 
-                self.suite[testclass.name] = testclass
+        for suite in suites:
+            cursuite = Suite()
+            self.suites.append(cursuite)
+            cursuite.name = suite.attrib["name"]
+            cursuite.duration = float(root.attrib.get("time", '0'))
 
-            newcase = Case()
-            newcase.name = testcase.attrib["name"]
-            newcase.testclass = testclass
-            newcase.duration = float(testcase.attrib["time"])
-            testclass.cases.append(newcase)
+            for testcase in suite:
+                if testcase.tag == "testcase":
+                    if testcase.attrib["classname"] not in cursuite:
+                        testclass = Class()
+                        testclass.name = testcase.attrib["classname"]
+                        if not testclass.name:
+                            testclass.name = "no-classname-set"
 
-            # does this test case have any children?
-            for child in testcase:
-                if child.tag == "skipped":
-                    newcase.skipped = child.text
-                    if "message" in child.attrib:
-                        newcase.skipped_msg = child.attrib["message"]
-                elif child.tag == "system-out":
-                    newcase.stdout = child.text
-                elif child.tag == "system-err":
-                    newcase.stderr = child.text
-                elif child.tag == "failure":
-                    newcase.failure = child.text
-                    if "message" in child.attrib:
-                        newcase.failure_msg = child.attrib["message"]
-                elif child.tag == "error":
-                    newcase.failure = child.text
-                    if "message" in child.attrib:
-                        newcase.failure_msg = child.attrib["message"]
-                elif child.tag == "properties":
-                    for property in child:
-                        newproperty = Property()
-                        newproperty.name = property.attrib["name"]
-                        newproperty.value = property.attrib["value"]
-                        newcase.properties.append(newproperty)
+                        cursuite[testclass.name] = testclass
 
-    def html(self):
+                    newcase = Case()
+                    newcase.name = testcase.attrib["name"]
+                    newcase.testclass = testclass
+                    newcase.duration = float(testcase.attrib["time"])
+                    testclass.cases.append(newcase)
+
+                    # does this test case have any children?
+                    for child in testcase:
+                        if child.tag == "skipped":
+                            newcase.skipped = child.text
+                            if "message" in child.attrib:
+                                newcase.skipped_msg = child.attrib["message"]
+                        elif child.tag == "system-out":
+                            newcase.stdout = child.text
+                        elif child.tag == "system-err":
+                            newcase.stderr = child.text
+                        elif child.tag == "failure":
+                            newcase.failure = child.text
+                            if "message" in child.attrib:
+                                newcase.failure_msg = child.attrib["message"]
+                        elif child.tag == "error":
+                            newcase.failure = child.text
+                            if "message" in child.attrib:
+                                newcase.failure_msg = child.attrib["message"]
+                        elif child.tag == "properties":
+                            for property in child:
+                                newproperty = Property()
+                                newproperty.name = property.attrib["name"]
+                                newproperty.value = property.attrib["value"]
+                                newcase.properties.append(newproperty)
+
+    def get_html_head(self):
         """
-        Render the test suite as a HTML report with links to errors first.
+        Get the HTML head
         :return:
         """
-        cssdata = self.get_css()
-
         return """
         <html>
         <head>
@@ -436,12 +452,18 @@ class Junit(object):
             <style type="text/css">
               {css}
             </style>
-        </head>
-        <body>
-        <h1>Test Report</h1>
-        {suite}
-        </body>
-        </html>
-        """.format(name=self.suite.name,
-                   css=cssdata,
-                   suite=self.suite.html())
+        </head>""".format(css=self.get_css(), name=self.filename)
+
+    def html(self):
+        """
+        Render the test suite as a HTML report with links to errors first.
+        :return:
+        """
+
+        page = self.get_html_head()
+        page += "<body><h1>Test Report</h1>"
+        for suite in self.suites:
+            page += suite.html()
+        page += "</body></html>"
+
+        return page
