@@ -6,12 +6,15 @@ produce a single html file from a single junit xml file.
 
 Usage:
 
+```
 $ junit2html JUNIT_XML_FILE [NEW_HTML_FILE]
+```
 
 eg:
 
+```
 $ junit2html pytest-results.xml testrun.html
-
+```
 
 Installation
 ------------
