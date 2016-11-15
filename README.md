@@ -18,8 +18,9 @@ $ junit2html pytest-results.xml testrun.html
 
 Installation
 ------------
-
+```
 $ sudo python setup.py install
+```
 
 About Junit
 -----------
