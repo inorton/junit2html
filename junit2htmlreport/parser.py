@@ -168,6 +168,7 @@ class Suite(object):
         self.name = None
         self.duration = 0
         self.classes = collections.OrderedDict()
+        self.package = None
         self.properties = {}
 
     def __contains__(self, item):
@@ -317,6 +318,10 @@ class Suite(object):
         """
         classes = list()
 
+        package = ""
+        if self.package is not None:
+            package = self.package
+
         for classname in self.classes:
             classes.append(self.classes[classname].html())
 
@@ -331,6 +336,7 @@ class Suite(object):
         return """
         <div class="testsuite">
             <h2>Test Suite: {name}</h2>
+            {package}
             {properties}
             <table>
             <tr><th align="left">Duration</th><td align="right">{duration} sec</td></tr>
@@ -349,6 +355,7 @@ class Suite(object):
         """.format(name=tag.text(self.name),
                    duration=self.duration,
                    toc=self.toc(),
+                   package=package,
                    properties=props,
                    classes="".join(classes),
                    count=len(self.all()),
@@ -400,7 +407,10 @@ class Junit(object):
         populate the report from the xml
         :return:
         """
-        root = self.tree.getroot()
+        if isinstance(self.tree, ET.Element):
+            root = self.tree
+        else:
+            root = self.tree.getroot()
 
         if root.tag == "testsuite":
             suites = [root]
@@ -411,10 +421,18 @@ class Junit(object):
             cursuite = Suite()
             self.suites.append(cursuite)
             cursuite.name = suite.attrib["name"]
+            if "package" in suite.attrib:
+                cursuite.package = suite.attrib["package"]
             cursuite.duration = float(root.attrib.get("time", '0'))
 
-            for testcase in suite:
-                if testcase.tag == "testcase":
+            for element in suite:
+                if element.tag == "properties":
+                    for prop in element:
+                        if prop.tag == "property":
+                            cursuite.properties[prop.attrib["name"]] = prop.attrib["value"]
+
+                if element.tag == "testcase":
+                    testcase = element
                     if testcase.attrib["classname"] not in cursuite:
                         testclass = Class()
                         testclass.name = testcase.attrib["classname"]

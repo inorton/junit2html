@@ -37,9 +37,24 @@ def test_parser():
     """
     junit = parser.Junit(filename=get_filepath("junit-simple_suite.xml"))
     assert len(junit.suites) == 1
+    assert len(junit.suites[0].properties) == 3
 
     junit = parser.Junit(filename=get_filepath("junit-simple_suites.xml"))
     assert len(junit.suites) == 1
+    assert len(junit.suites[0].properties) == 3
 
     junit = parser.Junit(filename=get_filepath("junit-complex_suites.xml"))
     assert len(junit.suites) == 66
+
+
+def test_parser_stringreader():
+    """
+    Test the junit parser when reading strings
+    :return:
+    """
+    with open(get_filepath("junit-complex_suites.xml"), "r") as data:
+        junit = parser.Junit(xmlstring=data.read())
+        assert len(junit.suites) == 66
+        assert junit.suites[0].name == "Untitled suite in /Users/niko/Sites/casperjs/tests/suites/casper/agent.js"
+        assert junit.suites[0].package == "tests/suites/casper/agent"
+        assert junit.suites[0].classes["tests/suites/casper/agent"].cases[1].name == "Default user agent matches /plop/"
