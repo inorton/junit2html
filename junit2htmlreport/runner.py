@@ -17,7 +17,7 @@ def run(args):
     :param args:
     :return:
     """
-    (opts, args) = PARSER.parse_args(args) if args else  PARSER.parse_args()
+    (opts, args) = PARSER.parse_args(args) if args else PARSER.parse_args()
     if not len(args):
         PARSER.print_usage()
         sys.exit(1)
@@ -37,7 +37,7 @@ def start():
     """
     Run using the current sys.argv
     """
-    run(sys.argv)
+    run(sys.argv[1:])
 
 
 if __name__ == "__main__":

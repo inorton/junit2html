@@ -160,11 +160,12 @@ class Case(AnchorBase):
                    stderr=stderr)
 
 
-class Suite(object):
+class Suite(AnchorBase):
     """
     Contains test cases (usually only one suite per report)
     """
     def __init__(self):
+        super(Suite, self).__init__()
         self.name = None
         self.duration = 0
         self.classes = collections.OrderedDict()
@@ -320,7 +321,7 @@ class Suite(object):
 
         package = ""
         if self.package is not None:
-            package = self.package
+            package = "Package: " + self.package + "<br/>"
 
         for classname in self.classes:
             classes.append(self.classes[classname].html())
@@ -335,7 +336,7 @@ class Suite(object):
 
         return """
         <div class="testsuite">
-            <h2>Test Suite: {name}</h2>
+            <h2>Test Suite: {name}</h2><a name="{anchor}">
             {package}
             {properties}
             <table>
@@ -353,6 +354,7 @@ class Suite(object):
             </div>
         </div>
         """.format(name=tag.text(self.name),
+                   anchor=self.anchor(),
                    duration=self.duration,
                    toc=self.toc(),
                    package=package,
@@ -486,6 +488,22 @@ class Junit(object):
             </style>
         </head>""".format(css=self.get_css(), name=self.filename)
 
+    def toc(self):
+        """
+        If this report has multiple suite results, make a table of contents listing each suite
+        :return:
+        """
+        if len(self.suites) > 1:
+            tochtml = "<ul>"
+            for suite in self.suites:
+                tochtml += '<li><a href="#{anchor}">{name}</a></li>'.format(
+                        anchor=suite.anchor(),
+                        name=tag.text(suite.name))
+            tochtml += "</ul>"
+            return tochtml
+        else:
+            return ""
+
     def html(self):
         """
         Render the test suite as a HTML report with links to errors first.
@@ -494,6 +512,7 @@ class Junit(object):
 
         page = self.get_html_head()
         page += "<body><h1>Test Report</h1>"
+        page += self.toc()
         for suite in self.suites:
             page += suite.html()
         page += "</body></html>"
