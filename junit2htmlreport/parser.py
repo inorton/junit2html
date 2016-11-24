@@ -446,7 +446,7 @@ class Junit(object):
                     newcase = Case()
                     newcase.name = testcase.attrib["name"]
                     newcase.testclass = testclass
-                    newcase.duration = float(testcase.attrib["time"])
+                    newcase.duration = float(testcase.attrib.get("time", '0'))
                     testclass.cases.append(newcase)
 
                     # does this test case have any children?
