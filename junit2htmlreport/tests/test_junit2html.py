@@ -46,6 +46,9 @@ def test_parser():
     junit = parser.Junit(filename=get_filepath("junit-complex_suites.xml"))
     assert len(junit.suites) == 66
 
+    junit = parser.Junit(filename=get_filepath("junit-cute2.xml"))
+    assert len(junit.suites) == 6
+
 
 def test_parser_stringreader():
     """
