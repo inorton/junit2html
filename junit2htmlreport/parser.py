@@ -425,7 +425,7 @@ class Junit(object):
             cursuite.name = suite.attrib["name"]
             if "package" in suite.attrib:
                 cursuite.package = suite.attrib["package"]
-            cursuite.duration = float(root.attrib.get("time", '0'))
+            cursuite.duration = float(suite.attrib.get("time", '0'))
 
             for element in suite:
                 if element.tag == "properties":
