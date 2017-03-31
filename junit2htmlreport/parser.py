@@ -246,7 +246,7 @@ class Suite(AnchorBase):
                     </li>
                     """.format(anchor=failure.anchor(),
                                name=tag.text(
-                                   failure.testclass.name + failure.name)))
+                                   failure.testclass.name + '.' + failure.name)))
 
             fails = """
             <li>Failures
