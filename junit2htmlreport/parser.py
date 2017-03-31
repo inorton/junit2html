@@ -226,7 +226,7 @@ class Suite(AnchorBase):
         Return all the passing testcases
         :return:
         """
-        return [test for test in self.all() if not test.failed()]
+        return [test for test in self.all() if not test.failed() and not test.skipped()]
 
     def toc(self):
         """
