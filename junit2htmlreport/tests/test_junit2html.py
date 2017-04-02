@@ -6,16 +6,26 @@ from inputfiles import get_filepath
 from junit2htmlreport import runner, parser
 
 
+def run_runner(tmpdir, filename):
+    """
+    Run the junit2html program against the given report and produce a html doc
+    :param tmpdir:
+    :param filename:
+    :return:
+    """
+    testfile = get_filepath(filename=filename)
+    outfile = os.path.join(tmpdir.strpath, "report.html")
+    runner.run([testfile, outfile])
+    assert os.path.exists(outfile)
+
+
 def test_runner_simple(tmpdir):
     """
     Test the stand-alone app with a simple fairly empty junit file
     :param tmpdir:  py.test tmpdir fixture
     :return:
     """
-    testfile = get_filepath("junit-simple_suites.xml")
-    outfile = os.path.join(tmpdir.strpath, "report.html")
-    runner.run([testfile, outfile])
-    assert os.path.exists(outfile)
+    run_runner(tmpdir, "junit-simple_suites.xml")
 
 
 def test_runner_complex(tmpdir):
@@ -24,10 +34,16 @@ def test_runner_complex(tmpdir):
     :param tmpdir:  py.test tmpdir fixture
     :return:
     """
-    testfile = get_filepath("junit-complex_suites.xml")
-    outfile = os.path.join(tmpdir.strpath, "report.html")
-    runner.run([testfile, outfile])
-    assert os.path.exists(outfile)
+    run_runner(tmpdir, "junit-complex_suites.xml")
+
+
+def test_runner_unicode(tmpdir):
+    """
+    Test the stand-alone app with a unicode file (contains a euro symbol)
+    :param tmpdir:
+    :return:
+    """
+    run_runner(tmpdir, "junit-unicode.xml")
 
 
 def test_parser():
@@ -48,6 +64,10 @@ def test_parser():
 
     junit = parser.Junit(filename=get_filepath("junit-cute2.xml"))
     assert len(junit.suites) == 6
+
+    junit = parser.Junit(filename=get_filepath("junit-unicode.xml"))
+    assert len(junit.suites) == 1
+    assert len(junit.suites[0].classes) == 1
 
 
 def test_parser_stringreader():

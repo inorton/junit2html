@@ -30,7 +30,7 @@ def run(args):
     html = report.html()
 
     with open(outfilename, "wb") as outfile:
-        outfile.write(html.encode('utf-8'))
+        outfile.write(html)
 
 
 def start():

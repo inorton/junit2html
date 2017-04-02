@@ -11,5 +11,9 @@ def text(content):
     :param content:
     :return:
     """
-    return cgi.escape(str(content))
+    string = ""
+    if content is not None:
+        string = content.encode("utf-8")
+        #string = content.encode('ascii', 'xmlcharrefreplace')
+    return cgi.escape(string)
 
