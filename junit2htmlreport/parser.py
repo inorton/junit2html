@@ -443,6 +443,7 @@ class Junit(object):
 
                         cursuite[testclass.name] = testclass
 
+                    testclass = cursuite[testcase.attrib["classname"]]
                     newcase = Case()
                     newcase.name = testcase.attrib["name"]
                     newcase.testclass = testclass
