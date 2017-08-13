@@ -29,7 +29,12 @@ def run(args):
     report = parser.Junit(args[0])
     html = report.html()
 
-    with open(outfilename, "wb") as outfile:
+    # In python3 this is going to be a str
+    bytes_mode = ""
+    if isinstance(html, bytes):
+        bytes_mode = "b"
+
+    with open(outfilename, "w" + bytes_mode) as outfile:
         outfile.write(html)
 
 

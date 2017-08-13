@@ -401,7 +401,7 @@ class Junit(object):
         :return:
         """
         thisdir = os.path.dirname(os.path.abspath(__file__))
-        with open(os.path.join(thisdir, self.css), "rb") as cssfile:
+        with open(os.path.join(thisdir, self.css), "r") as cssfile:
             return cssfile.read()
 
     def process(self):
