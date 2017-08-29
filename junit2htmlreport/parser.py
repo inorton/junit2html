@@ -425,7 +425,7 @@ class Junit(object):
             cursuite.name = suite.attrib["name"]
             if "package" in suite.attrib:
                 cursuite.package = suite.attrib["package"]
-            cursuite.duration = float(suite.attrib.get("time", '0'))
+            cursuite.duration = float(suite.attrib.get("time", '0').replace(',',''))
 
             for element in suite:
                 if element.tag == "properties":
@@ -447,7 +447,7 @@ class Junit(object):
                     newcase = Case()
                     newcase.name = testcase.attrib["name"]
                     newcase.testclass = testclass
-                    newcase.duration = float(testcase.attrib.get("time", '0'))
+                    newcase.duration = float(testcase.attrib.get("time", '0').replace(',',''))
                     testclass.cases.append(newcase)
 
                     # does this test case have any children?
