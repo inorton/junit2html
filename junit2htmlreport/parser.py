@@ -435,6 +435,10 @@ class Junit(object):
 
                 if element.tag == "testcase":
                     testcase = element
+
+                    if not "classname" in testcase.attrib:
+                        testcase.attrib["classname"] = "no-classname-set"
+
                     if testcase.attrib["classname"] not in cursuite:
                         testclass = Class()
                         testclass.name = testcase.attrib["classname"]
