@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 """
 Parse a junit report file into a family of objects
 """

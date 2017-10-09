@@ -69,6 +69,11 @@ def test_parser():
     assert len(junit.suites) == 1
     assert len(junit.suites[0].classes) == 1
 
+    # different report structure, both files contain unicode symbols
+    junit = parser.Junit(filename=get_filepath("junit-unicode2.xml"))
+    assert len(junit.suites) == 1
+    assert len(junit.suites[0].classes) == 1
+
 
 def test_parser_stringreader():
     """
