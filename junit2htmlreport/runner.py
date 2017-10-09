@@ -35,7 +35,7 @@ def run(args):
         bytes_mode = "b"
 
     with open(outfilename, "w" + bytes_mode) as outfile:
-        outfile.write(html)
+        outfile.write(html.encode('utf-8'))
 
 
 def start():

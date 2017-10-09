@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+ <testsuite name="Дратути" timestamp="2017-09-13T16:41:29" hostname="localhost" time="0.018" errors="0" tests="2" skipped="0" disabled="0" failures="0">
+  <testcase classname="Дратути" name="Этот кейс упадёт" time="0.001" />
+ </testsuite>
+</testsuites>
