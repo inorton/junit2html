@@ -11,6 +11,9 @@ import os
 import uuid
 
 
+NO_CLASSNAME = "no-testclass"
+
+
 class AnchorBase(object):
     """
     Base class that can generate a unique anchor name.
@@ -438,15 +441,12 @@ class Junit(object):
                 if element.tag == "testcase":
                     testcase = element
 
-                    if not "classname" in testcase.attrib:
-                        testcase.attrib["classname"] = "no-classname-set"
+                    if not testcase.attrib.get("classname", None):
+                        testcase.attrib["classname"] = NO_CLASSNAME
 
                     if testcase.attrib["classname"] not in cursuite:
                         testclass = Class()
                         testclass.name = testcase.attrib["classname"]
-                        if not testclass.name:
-                            testclass.name = "no-classname-set"
-
                         cursuite[testclass.name] = testclass
 
                     testclass = cursuite[testcase.attrib["classname"]]
