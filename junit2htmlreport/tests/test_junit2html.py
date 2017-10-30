@@ -37,6 +37,16 @@ def test_runner_complex(tmpdir):
     run_runner(tmpdir, "junit-complex_suites.xml")
 
 
+def test_runner_6700(tmpdir):
+    """
+    Test the 6700 report
+    I can't remember what is special about this file!
+    :param tmpdir:
+    :return:
+    """
+    run_runner(tmpdir, "junit-report-6700.xml")
+
+
 def test_runner_unicode(tmpdir):
     """
     Test the stand-alone app with a unicode file (contains a euro symbol)

@@ -176,6 +176,9 @@ class Suite(AnchorBase):
         self.classes = collections.OrderedDict()
         self.package = None
         self.properties = {}
+        self.errors = []
+        self.stdout = None
+        self.stderr = None
 
     def __contains__(self, item):
         """
@@ -331,6 +334,26 @@ class Suite(AnchorBase):
         for classname in self.classes:
             classes.append(self.classes[classname].html())
 
+        errs = ""
+        for error in self.errors:
+            if not len(errs):
+                errs += "<tr><th colspan='2' align='left'>Errors</th></tr>"
+            for part in ["type", "message", "text"]:
+                if part in error:
+                    errs += "<tr><td>{}</td><td><pre>{}</pre></td></tr>".format(
+                        part,
+                        tag.text(error[part]))
+
+        stdio = ""
+        if self.stderr or self.stdout:
+            stdio += "<tr><th colspan='2' align='left'>Output</th></tr>"
+            if self.stderr:
+                 stdio += "<tr><td>Stderr</td><td><pre>{}</pre></td></tr>".format(
+                        tag.text(self.stderr))
+            if self.stdout:
+                 stdio += "<tr><td>Stdout</td><td><pre>{}</pre></td></tr>".format(
+                        tag.text(self.stdout))
+
         props = ""
         if len(self.properties):
             props += "<table>"
@@ -348,6 +371,8 @@ class Suite(AnchorBase):
             <tr><th align="left">Duration</th><td align="right">{duration} sec</td></tr>
             <tr><th align="left">Test Cases</th><td align="right">{count}</td></tr>
             <tr><th align="left">Failures</th><td align="right">{fails}</td></tr>
+            {errs}
+            {stdio}
             </table>
             <a name="toc"></a>
             <h2>Results Index</h2>
@@ -361,6 +386,8 @@ class Suite(AnchorBase):
         """.format(name=tag.text(self.name),
                    anchor=self.anchor(),
                    duration=self.duration,
+                   errs=errs,
+                   stdio=stdio,
                    toc=self.toc(),
                    package=package,
                    properties=props,
@@ -433,6 +460,19 @@ class Junit(object):
             cursuite.duration = float(suite.attrib.get("time", '0').replace(',',''))
 
             for element in suite:
+                if element.tag == "error":
+                    # top level error?
+                    errtag = {
+                        "message": element.attrib.get("message", ""),
+                        "type": element.attrib.get("type", ""),
+                        "text": element.text
+                    }
+                    cursuite.errors.append(errtag)
+                if element.tag == "system-out":
+                    cursuite.stdout = element.text
+                if element.tag == "system-err":
+                    cursuite.stderr = element.text
+
                 if element.tag == "properties":
                     for prop in element:
                         if prop.tag == "property":
