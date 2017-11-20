@@ -56,6 +56,15 @@ def test_runner_unicode(tmpdir):
     run_runner(tmpdir, "junit-unicode.xml")
 
 
+def test_runner_testrun(tmpdir):
+    """
+    Test the stand-alone app with a file rooted at <testrun>
+    :param tmpdir:
+    :return:
+    """
+    run_runner(tmpdir, "junit-testrun.xml")
+
+
 def test_parser():
     """
     Test the junit parser directly

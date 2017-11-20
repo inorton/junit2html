@@ -441,15 +441,22 @@ class Junit(object):
         populate the report from the xml
         :return:
         """
+        suites = None
         if isinstance(self.tree, ET.Element):
             root = self.tree
         else:
             root = self.tree.getroot()
 
+        if root.tag == "testrun":
+            root = root[0]
+
         if root.tag == "testsuite":
             suites = [root]
-        elif root.tag == "testsuites":
+
+        if root.tag == "testsuites":
             suites = [x for x in root]
+
+        assert suites, "could not find test suites in results xml"
 
         for suite in suites:
             cursuite = Suite()

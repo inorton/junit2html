@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testrun name="CaseManagementConfidenceTestSuite" project="pr3unittest" tests="769" started="769" failures="8" errors="1" ignored="41">
+  <testsuite name="com.pega.pegarules.casemanagement.CaseManagementConfidenceTestSuite" time="7488.995">
+    <testsuite name="com.pega.pegarules.casemanagement.ScreenFlow.TestScreenFlow" time="64.842">
+      <testcase name="testScreenflowWithSubprocess" classname="com.pega.pegarules.casemanagement.ScreenFlow.TestScreenFlow" time="24.086"/>
+      <testcase name="testScreenflowWithAssignment" classname="com.pega.pegarules.casemanagement.ScreenFlow.TestScreenFlow" time="18.878"/>
+      <testcase name="testRecursiveScreenflow" classname="com.pega.pegarules.casemanagement.ScreenFlow.TestScreenFlow" time="2.402"/>
+      <testcase name="testMultipleRecursiveScreenflow" classname="com.pega.pegarules.casemanagement.ScreenFlow.TestScreenFlow" time="2.672"/>
+      <testcase name="testScreenflowWithTwoAssignments" classname="com.pega.pegarules.casemanagement.ScreenFlow.TestScreenFlow" time="4.521"/>
+      <testcase name="testRecursiveScreenFlowConditionally" classname="com.pega.pegarules.casemanagement.ScreenFlow.TestScreenFlow" time="12.283"/>
+    </testsuite>
+    <testsuite name="com.pega.pegarules.casemanagement.ScreenFlow.TestScreenFlowRuntimeRTS" time="7.673">
+      <testcase name="testScreenflowRuntime" classname="com.pega.pegarules.casemanagement.ScreenFlow.TestScreenFlowRuntimeRTS" time="7.673"/>
+    </testsuite>
+  </testsuite>
+</testrun>
