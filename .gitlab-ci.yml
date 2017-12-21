@@ -4,8 +4,8 @@ python27:
    - pip install pytest
    - python -m pytest junit2htmlreport
 
-python3:
-  image: python:3.0
+python36:
+  image: python:3.6
   script: 
    - pip install pytest
    - python -m pytest junit2htmlreport
