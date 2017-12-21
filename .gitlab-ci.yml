@@ -1,7 +1,11 @@
 python27:
   image: python:2.7
-  script: python -m pytest junit2htmlreport
+  script:
+   - pip install pytest
+   - python -m pytest junit2htmlreport
 
 python3:
   image: python:3.0
-  script: python -m pytest junit2htmlreport
+  script: 
+   - pip install pytest
+   - python -m pytest junit2htmlreport
