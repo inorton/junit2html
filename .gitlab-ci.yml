@@ -1,11 +1,19 @@
 python27:
   image: python:2.7
+  artifacts:
+    paths:
+    - junit2html*.xml*
   script:
    - pip install pytest
-   - python -m pytest junit2htmlreport
+   - python -m pytest junit2htmlreport --junitxml=junit2html-py27.xml
+   - python -m junit2htmlreport junit2html-py27.xml
 
 python36:
   image: python:3.6
+  artifacts:
+    paths:
+    - junit2html*.xml*
   script: 
    - pip install pytest
-   - python -m pytest junit2htmlreport
+   - python -m pytest junit2htmlreport --junitxml=junit2html-py36.xml
+   - python -m junit2htmlreport junit2html-py36.xml
