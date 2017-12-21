@@ -1,0 +1,3 @@
+test:
+  image: python:2.7
+  script: python -m pytest unithtmlreport
