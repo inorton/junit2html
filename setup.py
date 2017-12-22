@@ -9,7 +9,7 @@ setup(
     description="Generate HTML reports from Junit results",
     author="Ian Norton",
     author_email="inorton@gmail.com",
-    url="https://github.com/inorton/junit2html",
+    url="https://gitlab.com/inorton/junit2html",
     packages=["junit2htmlreport"],
     package_data={"junit2htmlreport": files},
     scripts=["junit2html"],
