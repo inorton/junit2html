@@ -54,7 +54,13 @@ Source and Releases
 
 Junit2html is maintained on gitlab at https://gitlab.com/inorton/junit2html
 
-The current master branch status of junit2html is [![pipeline status](https://gitlab.com/inorton/junit2html/badges/master/pipeline.svg)](https://gitlab.com/inorton/junit2html/commits/master)
+The current master build status of junit2html is:
+ [![pipeline status](https://gitlab.com/inorton/junit2html/badges/master/pipeline.svg)](https://gitlab.com/inorton/junit2html/commits/master)
+
+The current coverage status is:
+ [![coverage report](https://gitlab.com/inorton/junit2html/badges/master/coverage.svg)](https://gitlab.com/inorton/junit2html/commits/master)
+
+
 
 Releases are availible via Pypi using pip
 
