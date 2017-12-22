@@ -15,12 +15,28 @@ eg:
 ```
 $ junit2html pytest-results.xml testrun.html
 ```
+or
+```
+$ python -m junit2htmlreport pytest-results.xml
+```
 
 Installation
 ------------
 ```
 $ sudo python setup.py install
 ```
+or
+```
+$ sudo pip install junit2html
+```
+
+Example Outputs
+---------------
+
+You can see junit2html's own test report output content at:
+
+https://gitlab.com/inorton/junit2html/-/jobs/45530532/artifacts/browse
+
 
 About Junit
 -----------
@@ -33,12 +49,13 @@ xslt). The report files are understood by many things like Jenkins and various
 
 The format of junit files is described here: http://llg.cubic.org/docs/junit/
 
-Testing
--------
+Source and Releases
+-------------------
 
-Junit2html is kindly tested on Travis:
+Junit2html is maintained on gitlab at https://gitlab.com/inorton/junit2html
 
-![Travis CI](https://travis-ci.org/inorton/junit2html.svg?branch=master)
-https://travis-ci.org/inorton/junit2html 
+The current master branch status of junit2html is [![pipeline status](https://gitlab.com/inorton/junit2html/badges/master/pipeline.svg)](https://gitlab.com/inorton/junit2html/commits/master)
+
+Releases are availible via Pypi using pip
 
 
