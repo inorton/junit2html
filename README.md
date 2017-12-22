@@ -35,7 +35,7 @@ Example Outputs
 
 You can see junit2html's own test report output content at:
 
-https://gitlab.com/inorton/junit2html/-/jobs/45530532/artifacts/browse
+https://gitlab.com/inorton/junit2html/-/jobs/artifacts/master/browse?job=python36
 
 
 About Junit
