@@ -65,6 +65,22 @@ def test_runner_testrun(tmpdir):
     run_runner(tmpdir, "junit-testrun.xml")
 
 
+def test_emit_stdio():
+    """
+    Test the stand-alone app can generate a page from a report containing stdio text
+    But also save the result in the current folder
+    :return:
+    """
+    folder = os.path.dirname(__file__)
+    reportfile = os.path.join(folder, "junit-jenkins-stdout.xml")
+    runner.run([reportfile])
+    htmlfile = os.path.join(folder, "junit-jenkins-stdout.xml.html")
+    assert os.path.exists(htmlfile)
+    with open(htmlfile, "r") as readfile:
+        content = readfile.read()
+        assert "===&gt; Executing test case" in content
+
+
 def test_parser():
     """
     Test the junit parser directly
