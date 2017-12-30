@@ -1,8 +1,8 @@
 """
 Handle multiple parsed junit reports
 """
+from __future__ import unicode_literals
 import os
-
 from junit2htmlreport import parser
 
 
