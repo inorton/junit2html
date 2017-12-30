@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+from pip.utils.outdated import load_selfcheck_statefile
+
 """
 Parse a junit report file into a family of objects
 """
@@ -135,6 +137,17 @@ class Case(AnchorBase):
 
         properties = [x.html() for x in self.properties]
 
+        def render_stdoe():
+            if self.stderr or self.stdout:
+                return """
+            <div class="stdout"><i>Stdout</i><br/>
+                <pre>{stdout}</pre></div>
+            <hr size="1"/>
+            <div class="stderr"><i>Stderr</i><br/>
+                <pre>{stderr}</pre></div>
+                """.format(stderr=self.stderr, stdout=self.stdout)
+            return ""
+
         return """
     <a name="{anchor}">
         <div class="testcase">
@@ -147,11 +160,7 @@ class Case(AnchorBase):
             {failure}
             <hr size="1"/>
             {properties}
-            <div class="stdout"><i>Stdout</i><br/>
-                <pre>{stdout}</pre></div>
-            <hr size="1"/>
-            <div class="stderr"><i>Stderr</i><br/>
-                <pre>{stderr}</pre></div>
+            {stdoe}
         </div>
     </a>
         """.format(anchor=self.anchor(),
@@ -161,8 +170,7 @@ class Case(AnchorBase):
                    failure=failure,
                    skipped=skipped,
                    properties="".join(properties),
-                   stdout=stdout,
-                   stderr=stderr)
+                   stdoe=render_stdoe())
 
 
 class Suite(AnchorBase):
