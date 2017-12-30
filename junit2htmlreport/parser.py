@@ -100,6 +100,22 @@ class Case(AnchorBase):
         self.testclass = None
         self.properties = list()
 
+    def fullname(self):
+        """
+        Get the full name of a test case
+        :return:
+        """
+        return "{} : {}".format(self.testclass.name, self.name)
+
+    def basename(self):
+        """
+        Get a short name for this case
+        :return:
+        """
+        if self.name.startswith(self.testclass.name):
+            return self.name[len(self.testclass.name):]
+        return self.name
+
     def failed(self):
         """
         Return True if this test failed
@@ -113,7 +129,7 @@ class Case(AnchorBase):
         :return:
         """
         failure = ""
-        skipped = None
+        skipped = ""
         stdout = tag.text(self.stdout)
         stderr = tag.text(self.stderr)
 
@@ -145,7 +161,7 @@ class Case(AnchorBase):
             <hr size="1"/>
             <div class="stderr"><i>Stderr</i><br/>
                 <pre>{stderr}</pre></div>
-                """.format(stderr=self.stderr, stdout=self.stdout)
+                """.format(stderr=stderr, stdout=stdout)
             return ""
 
         return """
