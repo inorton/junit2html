@@ -100,6 +100,22 @@ class Case(AnchorBase):
         self.testclass = None
         self.properties = list()
 
+    def fullname(self):
+        """
+        Get the full name of a test case
+        :return:
+        """
+        return "{} : {}".format(self.testclass.name, self.name)
+
+    def basename(self):
+        """
+        Get a short name for this case
+        :return:
+        """
+        if self.name.startswith(self.testclass.name):
+            return self.name[len(self.testclass.name):]
+        return self.name
+
     def failed(self):
         """
         Return True if this test failed
