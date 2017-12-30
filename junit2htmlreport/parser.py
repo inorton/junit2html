@@ -113,7 +113,7 @@ class Case(AnchorBase):
         :return:
         """
         failure = ""
-        skipped = None
+        skipped = ""
         stdout = tag.text(self.stdout)
         stderr = tag.text(self.stderr)
 
@@ -145,7 +145,7 @@ class Case(AnchorBase):
             <hr size="1"/>
             <div class="stderr"><i>Stderr</i><br/>
                 <pre>{stderr}</pre></div>
-                """.format(stderr=self.stderr, stdout=self.stdout)
+                """.format(stderr=stderr, stdout=stdout)
             return ""
 
         return """
