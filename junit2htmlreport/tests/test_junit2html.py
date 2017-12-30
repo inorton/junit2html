@@ -3,7 +3,8 @@ Test that does nothing other than import
 """
 import os
 from inputfiles import get_filepath
-from junit2htmlreport.tests.helpers import *
+from helpers import run_runner
+from junit2htmlreport import parser, runner
 
 
 def test_runner_complex(tmpdir):

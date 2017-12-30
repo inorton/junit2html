@@ -3,7 +3,7 @@ Helper funcs for tests
 """
 import os
 from inputfiles import get_filepath
-from junit2htmlreport import runner, parser
+from junit2htmlreport import runner
 
 
 def run_runner(tmpdir, filename):
