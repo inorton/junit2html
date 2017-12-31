@@ -119,7 +119,7 @@ class HtmlReportMatrix(ReportMatrix, parser.HtmlHeadMixin):
                             cell = "f"
                             cellclass = "failed"
                         else:
-                            cell = "/"
+                            cell = "ok"
                             cellclass = "passed"
 
                     cell = "<a href='{}.html#{}'>{}</a>".format(

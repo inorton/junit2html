@@ -30,7 +30,7 @@ def test_matrix_html(tmpdir):
     Test loading multiple reports
     :return:
     """
-    htmatrix = matrix.HtmlReportMatrix(tmpdir)
+    htmatrix = matrix.HtmlReportMatrix(str(tmpdir))
     htmatrix.add_report(get_filepath("junit-simple_suite.xml"))
     htmatrix.add_report(get_filepath("junit-simple_suites.xml"))
 
