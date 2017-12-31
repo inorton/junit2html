@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="SystemTest" errors="0" skipped="1" tests="3" failures="0" time="34.2" timestamp="2018-03-21T11:24:12">
+    <testcase classname="Deployment.AutoTest" name="TestApplicationStarts" time="2.2"/>
+    <testcase classname="Deployment.AutoTest" name="TestApplicationStops" time="23.2"/>
+    <testcase classname="Deployment.AutoTest" name="TestApplicationRestarts" time="0.0">
+        <skipped />
+    </testcase>
+</testsuite>
