@@ -1,7 +1,7 @@
 """
 Small command line tool to generate a html version of a junit report file
 """
-
+import os
 from optparse import OptionParser
 import sys
 from junit2htmlreport import parser, matrix
@@ -13,6 +13,10 @@ PARSER = OptionParser(usage=USAGE, prog="junit2html")
 PARSER.add_option("--summary-matrix", dest="text_matrix", action="store_true",
                   default=False,
                   help="Render multiple result files to the console")
+
+PARSER.add_option("--report-matrix", dest="html_matrix", type=str,
+                  metavar="REPORT",
+                  help="Generate an HTML report matrix")
 
 
 def run(args):
@@ -31,6 +35,12 @@ def run(args):
         for filename in args:
             merge.add_report(filename)
         print(merge.summary())
+    elif opts.html_matrix:
+        merge = matrix.HtmlReportMatrix(os.path.dirname(opts.html_matrix))
+        for filename in args:
+            merge.add_report(filename)
+        with open(opts.html_matrix, "w") as outfile:
+            outfile.write(merge.summary())
     else:
         outfilename = args[0] + ".html"
         if len(args) > 1:
