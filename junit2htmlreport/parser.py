@@ -472,7 +472,7 @@ class Junit(HtmlHeadMixin):
         :param reportname:
         :return:
         """
-        return super().get_html_head(self.filename)
+        return super(Junit, self).get_html_head(reportname)
 
     def _read(self, xmlstring):
         """

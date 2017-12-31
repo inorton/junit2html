@@ -3,7 +3,7 @@ Handle multiple parsed junit reports
 """
 from __future__ import unicode_literals
 import os
-from junit2htmlreport import parser, runner
+from junit2htmlreport import parser
 
 
 class ReportMatrix(object):
@@ -11,7 +11,7 @@ class ReportMatrix(object):
     Load and handle several report files
     """
 
-    def __init__(self):
+    def __init__(self, extra=None):
         self.reports = {}
         self.cases = {}
         self.classes = {}
@@ -60,14 +60,14 @@ class HtmlReportMatrix(ReportMatrix, parser.HtmlHeadMixin):
     """
 
     def __init__(self, outdir):
-        super().__init__()
+        super(HtmlReportMatrix, self).__init__()
         self.outdir = outdir
 
     def add_report(self, filename):
         """
         Load a report
         """
-        super().add_report(filename)
+        super(HtmlReportMatrix, self).add_report(filename)
         basename = os.path.basename(filename)
         # make the individual report too
         report = self.reports[basename].html()
