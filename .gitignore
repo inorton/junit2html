@@ -4,3 +4,6 @@ build/
 .cache/
 .venv/
 MANIFEST
+.coverage
+*.xml
+*.xml.html
