@@ -1,11 +1,7 @@
-from __future__ import unicode_literals
-
-from pip.utils.outdated import load_selfcheck_statefile
-
 """
 Parse a junit report file into a family of objects
 """
-
+from __future__ import unicode_literals
 import xml.etree.ElementTree as ET
 import collections
 from junit2htmlreport import tag
@@ -14,6 +10,34 @@ import uuid
 
 
 NO_CLASSNAME = "no-testclass"
+
+
+class HtmlHeadMixin(object):
+    """
+    Head a html page
+    """
+    def get_css(self):
+        """
+        Return the content of the css file
+        :return:
+        """
+        thisdir = os.path.dirname(os.path.abspath(__file__))
+        with open(os.path.join(thisdir, "report.css"), "r") as cssfile:
+            return cssfile.read()
+
+    def get_html_head(self, reportname):
+        """
+        Get the HTML head
+        :return:
+        """
+        return """
+        <html>
+        <head>
+            <title>{name} - Junit Test Report</title>
+            <style type="text/css">
+              {css}
+            </style>
+        </head>""".format(css=self.get_css(), name=reportname)
 
 
 class AnchorBase(object):
@@ -420,7 +444,7 @@ class Suite(AnchorBase):
                    fails=len(self.failed()))
 
 
-class Junit(object):
+class Junit(HtmlHeadMixin):
     """
     Parse a single junit xml report
     """
@@ -441,7 +465,14 @@ class Junit(object):
             raise ValueError("Missing any filename or xmlstring")
         self.suites = []
         self.process()
-        self.css = "report.css"
+
+    def get_html_head(self, reportname):
+        """
+        Make the file header
+        :param reportname:
+        :return:
+        """
+        return super().get_html_head(self.filename)
 
     def _read(self, xmlstring):
         """
@@ -450,15 +481,6 @@ class Junit(object):
         :return:
         """
         self.tree = ET.fromstring(xmlstring)
-
-    def get_css(self):
-        """
-        Return the content of the css file
-        :return:
-        """
-        thisdir = os.path.dirname(os.path.abspath(__file__))
-        with open(os.path.join(thisdir, self.css), "r") as cssfile:
-            return cssfile.read()
 
     def process(self):
         """
@@ -552,20 +574,6 @@ class Junit(object):
                                 newproperty.value = property.attrib["value"]
                                 newcase.properties.append(newproperty)
 
-    def get_html_head(self):
-        """
-        Get the HTML head
-        :return:
-        """
-        return """
-        <html>
-        <head>
-            <title>{name} - Junit Test Report</title>
-            <style type="text/css">
-              {css}
-            </style>
-        </head>""".format(css=self.get_css(), name=self.filename)
-
     def toc(self):
         """
         If this report has multiple suite results, make a table of contents listing each suite
@@ -588,7 +596,7 @@ class Junit(object):
         :return:
         """
 
-        page = self.get_html_head()
+        page = self.get_html_head(self.filename)
         page += "<body><h1>Test Report</h1>"
         page += self.toc()
         for suite in self.suites:

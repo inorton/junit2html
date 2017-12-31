@@ -1,7 +1,7 @@
 """
 Small command line tool to generate a html version of a junit report file
 """
-
+import os
 from optparse import OptionParser
 import sys
 from junit2htmlreport import parser, matrix
@@ -36,7 +36,11 @@ def run(args):
             merge.add_report(filename)
         print(merge.summary())
     elif opts.html_matrix:
-        pass
+        merge = matrix.HtmlReportMatrix(os.path.dirname(opts.html_matrix))
+        for filename in args:
+            merge.add_report(filename)
+        with open(opts.html_matrix, "w") as outfile:
+            outfile.write(merge.summary())
     else:
         outfilename = args[0] + ".html"
         if len(args) > 1:

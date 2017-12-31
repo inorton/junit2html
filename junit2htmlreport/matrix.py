@@ -3,7 +3,7 @@ Handle multiple parsed junit reports
 """
 from __future__ import unicode_literals
 import os
-from junit2htmlreport import parser
+from junit2htmlreport import parser, runner
 
 
 class ReportMatrix(object):
@@ -52,6 +52,87 @@ class ReportMatrix(object):
         :return:
         """
         raise NotImplementedError()
+
+
+class HtmlReportMatrix(ReportMatrix, parser.HtmlHeadMixin):
+    """
+    Render a matrix report as html
+    """
+
+    def __init__(self, outdir):
+        super().__init__()
+        self.outdir = outdir
+
+    def add_report(self, filename):
+        """
+        Load a report
+        """
+        super().add_report(filename)
+        basename = os.path.basename(filename)
+        # make the individual report too
+        report = self.reports[basename].html()
+        with open(os.path.join(self.outdir, basename) + ".html", "w") as filehandle:
+            filehandle.write(report)
+
+    def summary(self):
+        """
+        Render the html
+        :return:
+        """
+        output = self.get_html_head("")
+        output += "<body>"
+        output += "<h2>Reports Matrix</h2><hr size='1'/>"
+
+        # table headers
+        output += "<table><tr><td></td>"
+        for axis in self.reports:
+            label = axis
+            if label.endswith(".xml"):
+                label = label[:-4]
+            output += "<th><p class='slanted'>{}</p></th>".format(label)
+        output += "</tr>"
+
+        # iterate each class
+        for classname in self.classes:
+            # new class
+            output += "<tr><td colspan='{}'>{}</td></tr>\n".format(
+                len(self.reports),
+                classname)
+
+            # print the case name
+            for casename in sorted(set(self.casenames[classname])):
+                output += "<tr><td>- {}</td>".format(casename)
+
+                # print each test and its result for each axis
+                for axis in self.reports:
+                    cellclass = "absent"
+                    anchor = None
+                    if axis not in self.cases[classname][casename]:
+                        cell = "&nbsp;"
+                    else:
+                        testcase = self.cases[classname][casename][axis]
+                        anchor = testcase.anchor()
+                        if testcase.skipped:
+                            cell = "s"
+                            cellclass = "skipped"
+                        elif testcase.failure:
+                            cell = "f"
+                            cellclass = "failed"
+                        else:
+                            cell = "/"
+                            cellclass = "passed"
+
+                    cell = "<a href='{}.html#{}'>{}</a>".format(
+                        axis, anchor, cell
+                    )
+                    output += "<td align='middle' class='{}'>{}</td>".format(cellclass,
+                                                                             cell)
+                output += "</tr>"
+
+        output += "</table>"
+        output += "</body>"
+        output += "</html>"
+        return output
 
 
 class TextReportMatrix(ReportMatrix):
@@ -108,6 +189,4 @@ class TextReportMatrix(ReportMatrix):
                             output += "/ "
 
                 output += "\n"
-
-
         return output
