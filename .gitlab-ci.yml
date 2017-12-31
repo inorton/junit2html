@@ -8,6 +8,7 @@ python27:
    - pip install pytest
    - python -m pytest -v junit2htmlreport --junitxml=junit2html-py27.xml
    - python -m junit2htmlreport junit2html-py27.xml
+   - python -m junit2htmlreport --report-matrix junit2htmlreport/tests/matrix-example.html junit2htmlreport/tests/junit-axis-linux.xml junit2htmlreport/tests/junit-axis-solaris.xml junit2htmlreport/tests/junit-axis-windows.xml
 
 python36:
   image: python:3.6
@@ -19,3 +20,4 @@ python36:
    - pip install pytest
    - python -m pytest -v junit2htmlreport --junitxml=junit2html-py36.xml
    - python -m junit2htmlreport junit2html-py36.xml
+   - python -m junit2htmlreport --report-matrix junit2htmlreport/tests/matrix-example.html junit2htmlreport/tests/junit-axis-linux.xml junit2htmlreport/tests/junit-axis-solaris.xml junit2htmlreport/tests/junit-axis-windows.xml
