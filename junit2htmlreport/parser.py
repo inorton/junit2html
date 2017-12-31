@@ -107,6 +107,7 @@ class Property(AnchorBase):
         <pre>{value}</pre></div>
         """.format(name=tag.text(self.name), value=tag.text(self.value))
 
+
 class Case(AnchorBase):
     """
     Test cases
@@ -555,6 +556,8 @@ class Junit(HtmlHeadMixin):
                             newcase.skipped = child.text
                             if "message" in child.attrib:
                                 newcase.skipped_msg = child.attrib["message"]
+                            if not newcase.skipped:
+                               newcase.skipped = "skipped"
                         elif child.tag == "system-out":
                             newcase.stdout = child.text
                         elif child.tag == "system-err":
@@ -563,10 +566,14 @@ class Junit(HtmlHeadMixin):
                             newcase.failure = child.text
                             if "message" in child.attrib:
                                 newcase.failure_msg = child.attrib["message"]
+                            if not newcase.failure:
+                                newcase.failure = "failed"
                         elif child.tag == "error":
                             newcase.failure = child.text
                             if "message" in child.attrib:
                                 newcase.failure_msg = child.attrib["message"]
+                            if not newcase.failure:
+                                newcase.failure = "error"
                         elif child.tag == "properties":
                             for property in child:
                                 newproperty = Property()
