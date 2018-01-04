@@ -608,7 +608,7 @@ class Junit(HtmlHeadMixin):
         if root.tag == "testsuites":
             suites = [x for x in root]
 
-        if not suites:
+        if suites is None:
             raise ParserError("could not find test suites in results xml")
 
         for suite in suites:
