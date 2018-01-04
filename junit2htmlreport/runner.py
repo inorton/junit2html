@@ -36,9 +36,8 @@ def run(args):
     if opts.merge_output:
         merger = merge.Merger()
         for inputfile in args:
-            report = parser.Junit(inputfile)
-            for suite in report.suites:
-                merger.add_suite(suite)
+            merger.load_report(inputfile)
+
         xmltext = merger.toxmlstring()
         with open(opts.merge_output, "w") as outfile:
             outfile.write(xmltext)

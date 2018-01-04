@@ -13,6 +13,14 @@ import uuid
 NO_CLASSNAME = "no-testclass"
 
 
+class ParserError(Exception):
+    """
+    We had a problem parsing a file
+    """
+    def __init__(self, message):
+        super(ParserError, self).__init__(message)
+
+
 class HtmlHeadMixin(object):
     """
     Head a html page
@@ -600,7 +608,8 @@ class Junit(HtmlHeadMixin):
         if root.tag == "testsuites":
             suites = [x for x in root]
 
-        assert suites, "could not find test suites in results xml"
+        if not suites:
+            raise ParserError("could not find test suites in results xml")
 
         for suite in suites:
             cursuite = Suite()
