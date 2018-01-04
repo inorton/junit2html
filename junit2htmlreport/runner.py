@@ -4,8 +4,7 @@ Small command line tool to generate a html version of a junit report file
 import os
 from optparse import OptionParser
 import sys
-from junit2htmlreport import parser, matrix
-
+from junit2htmlreport import parser, matrix, merge
 
 USAGE = "usage: %prog [OPTIONS] JUNIT_XML_REPORT [OUTFILE]"
 PARSER = OptionParser(usage=USAGE, prog="junit2html")
@@ -17,6 +16,10 @@ PARSER.add_option("--summary-matrix", dest="text_matrix", action="store_true",
 PARSER.add_option("--report-matrix", dest="html_matrix", type=str,
                   metavar="REPORT",
                   help="Generate an HTML report matrix")
+
+PARSER.add_option("--merge", dest="merge_output", type=str,
+                  metavar="NEWREPORT",
+                  help="Merge multiple test results into one file")
 
 
 def run(args):
@@ -30,17 +33,26 @@ def run(args):
         PARSER.print_usage()
         sys.exit(1)
 
-    if opts.text_matrix:
-        merge = matrix.TextReportMatrix()
+    if opts.merge_output:
+        merger = merge.Merger()
+        for inputfile in args:
+            report = parser.Junit(inputfile)
+            for suite in report.suites:
+                merger.add_suite(suite)
+        xmltext = merger.toxmlstring()
+        with open(opts.merge_output, "w") as outfile:
+            outfile.write(xmltext)
+    elif opts.text_matrix:
+        tmatrix = matrix.TextReportMatrix()
         for filename in args:
-            merge.add_report(filename)
-        print(merge.summary())
+            tmatrix.add_report(filename)
+        print(tmatrix.summary())
     elif opts.html_matrix:
-        merge = matrix.HtmlReportMatrix(os.path.dirname(opts.html_matrix))
+        hmatrix = matrix.HtmlReportMatrix(os.path.dirname(opts.html_matrix))
         for filename in args:
-            merge.add_report(filename)
+            hmatrix.add_report(filename)
         with open(opts.html_matrix, "w") as outfile:
-            outfile.write(merge.summary())
+            outfile.write(hmatrix.summary())
     else:
         outfilename = args[0] + ".html"
         if len(args) > 1:

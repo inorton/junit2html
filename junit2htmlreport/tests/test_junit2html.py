@@ -44,6 +44,27 @@ def test_runner_testrun(tmpdir):
     run_runner(tmpdir, "junit-testrun.xml")
 
 
+def test_runner_merge(tmpdir):
+    """
+    Test merging multiple files
+    :param tmpdir:
+    :return:
+    """
+    filenames = ["junit-complex_suites.xml",
+                 "junit-cute2.xml",
+                 "junit-unicode.xml"]
+
+    filepaths = []
+    for filename in filenames:
+        filepaths.append(
+            os.path.join(tmpdir.strpath, get_filepath(filename)))
+    newfile = os.path.join(tmpdir.strpath, "merged.xml")
+    args = ["--merge", newfile]
+    args.extend(filepaths)
+    runner.run(args)
+    assert os.path.exists(newfile)
+
+
 def test_emit_stdio():
     """
     Test the stand-alone app can generate a page from a report containing stdio text

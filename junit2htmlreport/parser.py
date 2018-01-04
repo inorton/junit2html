@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import xml.etree.ElementTree as ET
 import collections
 from junit2htmlreport import tag
+from junit2htmlreport.textutils import unicode_str
 import os
 import uuid
 
@@ -38,6 +39,34 @@ class HtmlHeadMixin(object):
               {css}
             </style>
         </head>""".format(css=self.get_css(), name=reportname)
+
+
+class ToJunitXmlBase(object):
+    """
+    Base class of all objects that can be serialized to Junit XML
+    """
+    def tojunit(self):
+        """
+        Return an Element matching this object
+        :return:
+        """
+        raise NotImplementedError()
+
+    def make_element(self, xmltag, text=None, attribs=None):
+        """
+        Create an Element and put text and/or attribs into it
+        :param xmltag: tag name
+        :param text:
+        :param attribs: dict of xml attributes
+        :return:
+        """
+        element = ET.Element(unicode_str(xmltag))
+        if text is not None:
+            element.text = unicode_str(text)
+        if attribs is not None:
+            for item in attribs:
+                element.set(unicode_str(item), unicode_str(attribs[item]))
+        return element
 
 
 class AnchorBase(object):
@@ -88,14 +117,25 @@ class Class(AnchorBase):
                    count=len(cases),
                    cases="".join(cases))
 
-class Property(AnchorBase):
+
+class Property(AnchorBase, ToJunitXmlBase):
     """
     Test Properties
     """
     def _init_(self):
         super(Property, self).__init__()
-        self.name=None
-        self.value=None
+        self.name = None
+        self.value = None
+
+    def tojunit(self):
+        """
+        Return the xml element for this property
+        :return:
+        """
+        prop = self.make_element("property")
+        prop.set(u"name", unicode_str(self.name))
+        prop.set(u"value", unicode_str(self.value))
+        return prop
 
     def html(self):
         """
@@ -108,7 +148,7 @@ class Property(AnchorBase):
         """.format(name=tag.text(self.name), value=tag.text(self.value))
 
 
-class Case(AnchorBase):
+class Case(AnchorBase, ToJunitXmlBase):
     """
     Test cases
     """
@@ -124,6 +164,44 @@ class Case(AnchorBase):
         self.name = None
         self.testclass = None
         self.properties = list()
+
+    def tojunit(self):
+        """
+        Turn this test case back into junit xml
+        :note: this may not be the exact input we loaded
+        :return:
+        """
+        testcase = self.make_element("testcase")
+        testcase.set(u"name", unicode_str(self.name))
+        testcase.set(u"classname", unicode_str(self.testclass.name))
+        testcase.set(u"time", unicode_str(self.duration))
+
+        if self.stderr is not None:
+            testcase.append(self.make_element("system-err", self.stderr))
+        if self.stdout is not None:
+            testcase.append(self.make_element("system-out", self.stdout))
+
+        if self.failure is not None:
+            testcase.append(self.make_element(
+                "failure", self.failure,
+                {
+                    "message": self.failure_msg
+                }))
+
+        if self.skipped:
+            testcase.append(self.make_element(
+                "skipped", self.skipped,
+                {
+                    "message": self.skipped_msg
+                }))
+
+        if self.properties:
+            props = self.make_element("properties")
+            for prop in self.properties:
+                props.append(prop.tojunit())
+            testcase.append(props)
+
+        return testcase
 
     def fullname(self):
         """
@@ -214,7 +292,7 @@ class Case(AnchorBase):
                    stdoe=render_stdoe())
 
 
-class Suite(AnchorBase):
+class Suite(AnchorBase, ToJunitXmlBase):
     """
     Contains test cases (usually only one suite per report)
     """
@@ -224,10 +302,28 @@ class Suite(AnchorBase):
         self.duration = 0
         self.classes = collections.OrderedDict()
         self.package = None
-        self.properties = {}
+        self.properties = []
         self.errors = []
         self.stdout = None
         self.stderr = None
+
+    def tojunit(self):
+        """
+        Return an element for this whole suite and all it's cases
+        :return:
+        """
+        suite = self.make_element("testsuite")
+        suite.set(u"name", unicode_str(self.name))
+        suite.set(u"time", unicode_str(self.duration))
+        if self.properties:
+            props = self.make_element("properties")
+            for prop in self.properties:
+                props.append(prop.tojunit())
+            suite.append(props)
+
+        for testcase in self.all():
+            suite.append(testcase.tojunit())
+        return suite
 
     def __contains__(self, item):
         """
@@ -397,18 +493,19 @@ class Suite(AnchorBase):
         if self.stderr or self.stdout:
             stdio += "<tr><th colspan='2' align='left'>Output</th></tr>"
             if self.stderr:
-                 stdio += "<tr><td>Stderr</td><td><pre>{}</pre></td></tr>".format(
+                stdio += "<tr><td>Stderr</td><td><pre>{}</pre></td></tr>".format(
                         tag.text(self.stderr))
             if self.stdout:
-                 stdio += "<tr><td>Stdout</td><td><pre>{}</pre></td></tr>".format(
+                stdio += "<tr><td>Stdout</td><td><pre>{}</pre></td></tr>".format(
                         tag.text(self.stdout))
 
         props = ""
         if len(self.properties):
             props += "<table>"
-            propnames = sorted(self.properties)
-            for prop in propnames:
-                props += "<tr><th>{}</th><td>{}</td></tr>".format(prop, self.properties[prop])
+            for prop in self.properties:
+                # we dont call the html method, we want these in a table
+                props += "<tr><th>{}</th><td>{}</td></tr>".format(
+                    tag.text(prop.name), tag.text(prop.value))
             props += "</table>"
 
         return """
@@ -530,7 +627,10 @@ class Junit(HtmlHeadMixin):
                 if element.tag == "properties":
                     for prop in element:
                         if prop.tag == "property":
-                            cursuite.properties[prop.attrib["name"]] = prop.attrib["value"]
+                            newproperty = Property()
+                            newproperty.name = prop.attrib["name"]
+                            newproperty.value = prop.attrib["value"]
+                            cursuite.properties.append(newproperty)
 
                 if element.tag == "testcase":
                     testcase = element

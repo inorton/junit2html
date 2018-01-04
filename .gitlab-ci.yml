@@ -9,6 +9,8 @@ python27:
    - python -m pytest -v junit2htmlreport --junitxml=junit2html-py27.xml
    - python -m junit2htmlreport junit2html-py27.xml
    - python -m junit2htmlreport --report-matrix junit2htmlreport/tests/matrix-example.html junit2htmlreport/tests/junit-axis-linux.xml junit2htmlreport/tests/junit-axis-solaris.xml junit2htmlreport/tests/junit-axis-windows.xml
+   - python -m junit2htmlreport --merge junit2html-merged-example.xml junit2htmlreport/tests/junit-unicode.xml junit2htmlreport/tests/junit-unicode2.xml junit2htmlreport/tests/junit-cute2.xml
+   - python -m junit2htmlreport junit2html-merged-example.xml
 
 python36:
   image: python:3.6
@@ -21,3 +23,5 @@ python36:
    - python -m pytest -v junit2htmlreport --junitxml=junit2html-py36.xml
    - python -m junit2htmlreport junit2html-py36.xml
    - python -m junit2htmlreport --report-matrix junit2htmlreport/tests/matrix-example.html junit2htmlreport/tests/junit-axis-linux.xml junit2htmlreport/tests/junit-axis-solaris.xml junit2htmlreport/tests/junit-axis-windows.xml
+   - python -m junit2htmlreport --merge junit2html-merged-example.xml junit2htmlreport/tests/junit-unicode.xml junit2htmlreport/tests/junit-unicode2.xml junit2htmlreport/tests/junit-cute2.xml
+   - python -m junit2htmlreport junit2html-merged-example.xml
