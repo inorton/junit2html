@@ -594,10 +594,10 @@ class Junit(HtmlHeadMixin):
         :return:
         """
         suites = None
-        if isinstance(self.tree, ET.Element):
-            root = self.tree
-        else:
+        if isinstance(self.tree, ET.ElementTree):
             root = self.tree.getroot()
+        else:
+            root = self.tree
 
         if root.tag == "testrun":
             root = root[0]
