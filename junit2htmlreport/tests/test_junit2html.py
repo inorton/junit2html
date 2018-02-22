@@ -7,6 +7,15 @@ from helpers import run_runner
 from junit2htmlreport import parser, runner
 
 
+def test_runner_sonobouy(tmpdir):
+    """
+    Test the stand-alone app with report produced by sonobouy
+    :param tmpdir:  py.test tmpdir fixture
+    :return:
+    """
+    run_runner(tmpdir, "junit-sonobouy.xml")
+
+
 def test_runner_complex(tmpdir):
     """
     Test the stand-alone app with a large fairly complex junit file

@@ -610,11 +610,13 @@ class Junit(HtmlHeadMixin):
 
         if suites is None:
             raise ParserError("could not find test suites in results xml")
-
+        suitecount = 0
         for suite in suites:
+            suitecount += 1
             cursuite = Suite()
             self.suites.append(cursuite)
-            cursuite.name = suite.attrib["name"]
+            suitename = suite.attrib.get("name", "suite-" + str(suitecount))
+            cursuite.name = suitename
             if "package" in suite.attrib:
                 cursuite.package = suite.attrib["package"]
             cursuite.duration = float(suite.attrib.get("time", '0').replace(',',''))
