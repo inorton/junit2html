@@ -146,7 +146,7 @@ class HtmlReportMatrix(ReportMatrix, parser.HtmlHeadMixin):
 
             # print the case name
             for casename in sorted(set(self.casenames[classname])):
-                output += "<tr><td width='16'>- {}</td>".format(casename)
+                output += "<tr><td width='16'>-&nbsp;{}</td>".format(casename)
 
                 case_results = []
 
