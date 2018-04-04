@@ -4,6 +4,12 @@ Handle multiple parsed junit reports
 from __future__ import unicode_literals
 import os
 from junit2htmlreport import parser
+from junit2htmlreport.parser import SKIPPED, FAILED, PASSED, ABSENT
+
+UNTESTED = "untested"
+PARTIAL_PASS = "partial pass"
+PARTIAL_FAIL = "partial failure"
+TOTAL_FAIL = "total failure"
 
 
 class ReportMatrix(object):
@@ -16,6 +22,28 @@ class ReportMatrix(object):
         self.cases = {}
         self.classes = {}
         self.casenames = {}
+        self.result_stats = {}
+
+    def report_order(self):
+        return sorted(self.reports.keys())
+
+    def short_outcome(self, outcome):
+        if outcome == PASSED:
+            return "/"
+        elif outcome == SKIPPED:
+            return "s"
+        elif outcome == FAILED:
+            return "f"
+        elif outcome == TOTAL_FAIL:
+            return "F"
+        elif outcome == PARTIAL_PASS:
+            return "%"
+        elif outcome == PARTIAL_FAIL:
+            return "X"
+        elif outcome == UNTESTED:
+            return "U"
+
+        return "?"
 
     def add_report(self, filename):
         """
@@ -46,6 +74,10 @@ class ReportMatrix(object):
                         self.cases[testclass][basename] = {}
                     self.cases[testclass][basename][filename] = testcase
 
+                    outcome = testcase.outcome()
+                    self.result_stats[outcome] = 1 + self.result_stats.get(
+                        outcome, 0)
+
     def summary(self):
         """
         Render a summary of the matrix
@@ -53,27 +85,24 @@ class ReportMatrix(object):
         """
         raise NotImplementedError()
 
+    def combined_result(self, results):
+        """
+        Given a list of results, produce a "combined" overall result
+        :param results:
+        :return:
+        """
+        if PASSED in results:
+            if FAILED in results:
+                return self.short_outcome(PARTIAL_FAIL), PARTIAL_FAIL.title()
+            if SKIPPED in results:
+                return self.short_outcome(PARTIAL_PASS), PARTIAL_PASS.title()
+            return self.short_outcome(PASSED), PASSED.title()
 
-def combined_result(results):
-    """
-    Given a list of results, produce a "combined" overall result
-    :param results:
-    :return:
-    """
-
-    if "passed" in results:
-        if "failed" in results:
-            return "X", "Partial Failure"
-        if "skipped" in results:
-            return "%", "Partial Pass"
-        return "*", "Pass"
-
-    if "failed" in results:
-        return "F", "Total Failure"
-
-    if "skipped" in results:
-        return "U", "Untested"
-    return " ", ""
+        if FAILED in results:
+            return self.short_outcome(TOTAL_FAIL), TOTAL_FAIL.title()
+        if SKIPPED in results:
+            return self.short_outcome(UNTESTED), UNTESTED.title()
+        return " ", ""
 
 
 class HtmlReportMatrix(ReportMatrix, parser.HtmlHeadMixin):
@@ -93,8 +122,26 @@ class HtmlReportMatrix(ReportMatrix, parser.HtmlHeadMixin):
         basename = os.path.basename(filename)
         # make the individual report too
         report = self.reports[basename].html()
-        with open(os.path.join(self.outdir, basename) + ".html", "w") as filehandle:
+        with open(os.path.join(self.outdir, basename) + ".html",
+                  "w") as filehandle:
             filehandle.write(report)
+
+    def get_stats_table(self):
+        stats = "<table class='result-stats'>"
+        for outcome in sorted(self.result_stats.keys()):
+            stats += "<tr><th class='{}'>{}<th>" \
+                     "<td align='right'>{}</td></tr>".format(
+                outcome,
+                outcome.title(),
+                self.result_stats[outcome]
+            )
+        stats += "</table>"
+        return stats
+
+    def short_outcome(self, outcome):
+        if outcome == PASSED:
+            return "ok"
+        return super(HtmlReportMatrix, self).short_outcome(outcome)
 
     def summary(self):
         """
@@ -114,25 +161,39 @@ class HtmlReportMatrix(ReportMatrix, parser.HtmlHeadMixin):
         #   test1  f  /  s  % Partial Failure
         #   test2  s  /  -  % Partial Pass
         #   test3  /  /  /  * Pass
-        output += "<table>"
+        output += "<table class='test-matrix'>"
 
         def make_underskip(length):
             return "<td align='middle'>&#124;</td>" * length
 
         spansize = 1 + len(self.reports)
         report_headers = 0
-        for axis in self.reports:
+
+        shown_stats = False
+
+        stats = self.get_stats_table()
+
+        for axis in self.report_order():
             label = axis
             if label.endswith(".xml"):
                 label = label[:-4]
             underskip = make_underskip(report_headers)
 
-            header = "<td colspan='{}'><pre>{}</pre></td>".format(spansize, label)
+            header = "<td colspan='{}'><pre>{}</pre></td>".format(spansize,
+                                                                  label)
             spansize -= 1
             report_headers += 1
+            first_cell = ""
+            if not shown_stats:
+                # insert the stats table
+                first_cell = "<td rowspan='{}'>{}</td>".format(
+                    len(self.report_order()),
+                    stats
+                )
+                shown_stats = True
 
-            output += "<tr><td></td>{}{}</tr>".format(
-                underskip, header)
+            output += "<tr>{}{}{}</tr>".format(first_cell,
+                                               underskip, header)
 
         output += "<tr><td></td>{}</tr>".format(
             make_underskip(len(self.reports)))
@@ -140,51 +201,51 @@ class HtmlReportMatrix(ReportMatrix, parser.HtmlHeadMixin):
         # iterate each class
         for classname in self.classes:
             # new class
-            output += "<tr><td colspan='{}'>{}</td></tr>\n".format(
+            output += "<tr class='testclass'><td colspan='{}'>{}</td></tr>\n".format(
                 len(self.reports) + 2,
                 classname)
 
             # print the case name
             for casename in sorted(set(self.casenames[classname])):
-                output += "<tr><td width='16'>-&nbsp;{}</td>".format(casename)
+                output += "<tr class='testcase'><td width='16'>-&nbsp;{}</td>".format(casename)
 
                 case_results = []
 
                 # print each test and its result for each axis
                 celltds = ""
-                for axis in self.reports:
-                    cellclass = "absent"
+                for axis in self.report_order():
+                    cellclass = ABSENT
                     anchor = None
                     if axis not in self.cases[classname][casename]:
                         cell = "&nbsp;"
                     else:
                         testcase = self.cases[classname][casename][axis]
                         anchor = testcase.anchor()
-                        if testcase.skipped:
-                            cell = "s"
-                            cellclass = "skipped"
-                        elif testcase.failure:
-                            cell = "f"
-                            cellclass = "failed"
-                        else:
-                            cell = "ok"
-                            cellclass = "passed"
+
+                        cellclass = testcase.outcome()
+                        cell = self.short_outcome(cellclass)
                     case_results.append(cellclass)
 
-                    cell = "<a href='{}.html#{}'>{}</a>".format(
-                        axis, anchor, cell
+                    cell = "<a class='tooltip-parent testcase-link' href='{}.html#{}'>{}{}</a>".format(
+                        axis, anchor, cell,
+                        "<div class='tooltip'>({}) {}</div>".format(
+                            cellclass.title(),
+                            axis)
                     )
-                    celltds += "<td align='middle' " \
-                               "class='{}' width='16'>{}</td>".format(
+                    if cellclass == ABSENT:
+                        cell = ""
+
+                    celltds += "<td class='testcase-cell {}'>{}</td>".format(
                         cellclass,
                         cell)
 
-                combined, combined_name = combined_result(case_results)
+                combined_name = self.combined_result(case_results)[1]
 
                 output += celltds
-                output += "<td class='{}'><tt>{}</tt> {}</td></tr>".format(
-                    "", combined, combined_name
+                output += "<td span class='testcase-combined'>{}</td>".format(
+                    combined_name
                 )
+                output += "</tr>"
 
         output += "</table>"
         output += "</body>"
@@ -218,8 +279,9 @@ class TextReportMatrix(ReportMatrix):
 
         # render the axis headings in a stepped tree
         treelines = ""
-        for filename in self.reports:
-            output += "{}    {}{}\n".format(" " * left_indent, treelines, filename)
+        for filename in self.report_order():
+            output += "{}    {}{}\n".format(" " * left_indent, treelines,
+                                            filename)
             treelines += "| "
         output += "{}    {}\n".format(" " * left_indent, treelines)
         # render in groups of the same class
@@ -230,27 +292,42 @@ class TextReportMatrix(ReportMatrix):
             case_results = []
             # print the case name
             for casename in sorted(set(self.casenames[classname])):
-                output += "- {}{}  ".format(casename, " " * (left_indent - len(casename)))
+                output += "- {}{}  ".format(casename,
+                                            " " * (left_indent - len(casename)))
 
                 # print each test and its result for each axis
                 case_data = ""
-                for axis in self.reports:
+                for axis in self.report_order():
                     if axis not in self.cases[classname][casename]:
                         case_data += "  "
                     else:
                         testcase = self.cases[classname][casename][axis]
                         if testcase.skipped:
                             case_data += "s "
-                            case_results.append("skipped")
+                            case_results.append(SKIPPED)
                         elif testcase.failure:
                             case_data += "f "
-                            case_results.append("failed")
+                            case_results.append(FAILED)
                         else:
                             case_data += "/ "
-                            case_results.append("passed")
+                            case_results.append(PASSED)
 
-                combined, combined_name = combined_result(case_results)
+                combined, combined_name = self.combined_result(case_results)
 
                 output += case_data
                 output += " {} {}\n".format(combined, combined_name)
+
+        # print the result stats
+
+        output += "\n"
+        output += "-" * 79
+        output += "\n"
+
+        output += "Test Results:\n"
+
+        for outcome in sorted(self.result_stats):
+            output += "  {:<12} : {:>6}\n".format(
+                outcome.title(),
+                self.result_stats[outcome])
+
         return output

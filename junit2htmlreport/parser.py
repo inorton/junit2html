@@ -12,6 +12,11 @@ import uuid
 
 NO_CLASSNAME = "no-testclass"
 
+FAILED = "failed"  # the test failed
+SKIPPED = "skipped"  # the test was skipped
+PASSED = "passed"  # the test completed successfully
+ABSENT = "absent"  # the test was known but not run/failed/skipped
+
 
 class ParserError(Exception):
     """
@@ -160,6 +165,7 @@ class Case(AnchorBase, ToJunitXmlBase):
     """
     Test cases
     """
+
     def __init__(self):
         super(Case, self).__init__()
         self.failure = None
@@ -172,6 +178,17 @@ class Case(AnchorBase, ToJunitXmlBase):
         self.name = None
         self.testclass = None
         self.properties = list()
+
+    def outcome(self):
+        """
+        Return the result of this test case
+        :return:
+        """
+        if self.skipped:
+            return SKIPPED
+        elif self.failed():
+            return FAILED
+        return PASSED
 
     def tojunit(self):
         """

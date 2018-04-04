@@ -9,6 +9,17 @@ li > a {
     font-family: monospace;
 }
 
+body {
+    margin-bottom: 3em;
+}
+
+.testclass > td {
+    border-bottom: 1px solid silver;
+    color: #222222;
+    padding: 3px;
+    font-weight: bold;
+}
+
 .testclass > div {
     padding-left: 1em;
 }
@@ -40,19 +51,25 @@ li > a {
     margin-left: 1em;
 }
 
-.skipped {
-    background-color: #eeee00;
+.testcase-link {
+    text-decoration: none;
 }
 
-.failure {
-    background-color: #eeaaaa;
+.testcase-cell {
+    height: 1.8em;
+    width: 1.8em;
+    vertical-align: middle;
+    text-align: center;
+}
+.testcase-cell a {
+    display: inline-block;
+    margin: -1em;
+    padding: 1em;
 }
 
-.slanted {
-    writing-mode: vertical-rl;
-    white-space: nowrap;
-    text-align: right;
-    font-family: monospace;
+.testcase-combined {
+    white-space: pre;
+    padding-left: 1em;
 }
 
 .skipped {
@@ -65,4 +82,29 @@ li > a {
 
 .passed {
     background-color: limegreen;
+}
+
+.tooltip {
+    visibility: hidden;
+    padding: 2px;
+    z-index: 1;
+    position: absolute;
+    background: cornsilk;
+    border: 1px solid black;
+    margin-top: 15px;
+    margin-left: 10px;
+    opacity: 0;
+}
+.tooltip-parent:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.testcase:hover {
+    background-color: gray;
+    color: white;
+}
+
+.result-stats {
+    margin: auto;
 }
