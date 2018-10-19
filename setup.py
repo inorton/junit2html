@@ -5,7 +5,7 @@ files = ["*.css"]
 
 setup(
     name="junit2html",
-    version="021",
+    version="022",
     description="Generate HTML reports from Junit results",
     author="Ian Norton",
     author_email="inorton@gmail.com",

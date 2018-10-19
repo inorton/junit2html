@@ -289,7 +289,7 @@ class TextReportMatrix(ReportMatrix):
         for classname in self.classes:
             # new class
             output += "{}  \n".format(classname)
-            case_results = []
+
             # print the case name
             for casename in sorted(set(self.casenames[classname])):
                 output += "- {}{}  ".format(casename,
@@ -297,6 +297,7 @@ class TextReportMatrix(ReportMatrix):
 
                 # print each test and its result for each axis
                 case_data = ""
+                case_results = []
                 for axis in self.report_order():
                     if axis not in self.cases[classname][casename]:
                         case_data += "  "
@@ -310,7 +311,7 @@ class TextReportMatrix(ReportMatrix):
                             case_results.append(FAILED)
                         else:
                             case_data += "/ "
-                            case_results.append(PASSED)
+                            self.append = case_results.append(PASSED)
 
                 combined, combined_name = self.combined_result(case_results)
 
