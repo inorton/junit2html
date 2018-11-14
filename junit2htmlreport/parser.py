@@ -135,7 +135,7 @@ class Property(AnchorBase, ToJunitXmlBase):
     """
     Test Properties
     """
-    def _init_(self):
+    def __init__(self):
         super(Property, self).__init__()
         self.name = None
         self.value = None
