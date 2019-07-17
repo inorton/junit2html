@@ -1,6 +1,8 @@
 junit2html by Ian Norton <inorton@gmail.com>
 -------------------------------------------------------------
 
+Hosted at https://gitlab.com/inorton/junit2html 
+
 This is a simple self-contained python tool to
 produce a single html file from a single junit xml file.
 
