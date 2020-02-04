@@ -23,9 +23,13 @@ class ReportMatrix(object):
         self.classes = {}
         self.casenames = {}
         self.result_stats = {}
+        self.requirements = {}
 
     def report_order(self):
         return sorted(self.reports.keys())
+
+    def requirement_order(self):
+        return sorted(self.requirements.keys())
 
     def short_outcome(self, outcome):
         if outcome == PASSED:
@@ -72,11 +76,21 @@ class ReportMatrix(object):
                         self.cases[testclass] = {}
                     if basename not in self.cases[testclass]:
                         self.cases[testclass][basename] = {}
+
                     self.cases[testclass][basename][filename] = testcase
 
                     outcome = testcase.outcome()
                     self.result_stats[outcome] = 1 + self.result_stats.get(
                         outcome, 0)
+
+                    # For each SRS ID, add a column
+                    for prop in testcase.properties:
+                        if prop.name == "srs_id":
+                            if prop.value not in self.requirements:
+                                self.requirements[prop.value] = []
+                            self.requirements[prop.value].append(testcase)
+                            self.cases[testclass][basename][prop.value] = testcase
+
 
     def summary(self):
         """
@@ -129,12 +143,12 @@ class HtmlReportMatrix(ReportMatrix, parser.HtmlHeadMixin):
     def get_stats_table(self):
         stats = "<table class='result-stats'>"
         for outcome in sorted(self.result_stats.keys()):
-            stats += "<tr><th class='{}'>{}<th>" \
-                     "<td align='right'>{}</td></tr>".format(
-                outcome,
-                outcome.title(),
-                self.result_stats[outcome]
-            )
+            stats += "<tr><th class='{}'>Tests {}<th>" \
+                "<td align='right'>{}</td></tr>".format(
+                    outcome,
+                    outcome.title(),
+                    self.result_stats[outcome]
+                )
         stats += "</table>"
         return stats
 
@@ -163,57 +177,59 @@ class HtmlReportMatrix(ReportMatrix, parser.HtmlHeadMixin):
         #   test3  /  /  /  * Pass
         output += "<table class='test-matrix'>"
 
-        def make_underskip(length):
-            return "<td align='middle'>&#124;</td>" * length
+        # def make_underskip(length):
+        #     return "<td align='middle'>&#124;</td>" * length
 
-        spansize = 1 + len(self.reports)
+        spansize = 1 + len(self.requirements)
         report_headers = 0
 
         shown_stats = False
 
         stats = self.get_stats_table()
+        output += "<tr>"
 
-        for axis in self.report_order():
+        for axis in self.requirement_order():
             label = axis
             if label.endswith(".xml"):
                 label = label[:-4]
-            underskip = make_underskip(report_headers)
+            # underskip = make_underskip(report_headers)
 
-            header = "<td colspan='{}'><pre>{}</pre></td>".format(spansize,
-                                                                  label)
+            # header = "<td colspan='{}'><pre>{}</pre></td>".format(spansize,
+            #                                                       label)
+            header = "<td colspan='1'><pre>{}</pre></td>".format(label)
             spansize -= 1
             report_headers += 1
             first_cell = ""
             if not shown_stats:
                 # insert the stats table
-                first_cell = "<td rowspan='{}'>{}</td>".format(
-                    len(self.report_order()),
+                first_cell = "<td>{}</td>".format(
                     stats
                 )
+                output += first_cell
                 shown_stats = True
 
-            output += "<tr>{}{}{}</tr>".format(first_cell,
-                                               underskip, header)
+            output += header
 
-        output += "<tr><td></td>{}</tr>".format(
-            make_underskip(len(self.reports)))
+        # output += "<tr><td></td>{}</tr>".format(
+        #     make_underskip(len(self.requirements)))
+        output += "</tr>"
 
         # iterate each class
         for classname in self.classes:
             # new class
             output += "<tr class='testclass'><td colspan='{}'>{}</td></tr>\n".format(
-                len(self.reports) + 2,
+                len(self.requirements) + 2,
                 classname)
 
             # print the case name
             for casename in sorted(set(self.casenames[classname])):
-                output += "<tr class='testcase'><td width='16'>-&nbsp;{}</td>".format(casename)
+                output += "<tr class='testcase'><td width='16'>{}</td>".format(casename)
 
                 case_results = []
 
                 # print each test and its result for each axis
                 celltds = ""
-                for axis in self.report_order():
+                for axis in self.requirement_order():
                     cellclass = ABSENT
                     anchor = None
                     if axis not in self.cases[classname][casename]:
@@ -226,8 +242,10 @@ class HtmlReportMatrix(ReportMatrix, parser.HtmlHeadMixin):
                         cell = self.short_outcome(cellclass)
                     case_results.append(cellclass)
 
+                    # Assume only one report file
+                    report_name = list(self.reports.keys())[0]
                     cell = "<a class='tooltip-parent testcase-link' href='{}.html#{}'>{}{}</a>".format(
-                        axis, anchor, cell,
+                        report_name, anchor, cell,
                         "<div class='tooltip'>({}) {}</div>".format(
                             cellclass.title(),
                             axis)
@@ -279,7 +297,7 @@ class TextReportMatrix(ReportMatrix):
 
         # render the axis headings in a stepped tree
         treelines = ""
-        for filename in self.report_order():
+        for filename in self.requirement_order():
             output += "{}    {}{}\n".format(" " * left_indent, treelines,
                                             filename)
             treelines += "| "
@@ -298,7 +316,7 @@ class TextReportMatrix(ReportMatrix):
                 # print each test and its result for each axis
                 case_data = ""
                 case_results = []
-                for axis in self.report_order():
+                for axis in self.requirement_order():
                     if axis not in self.cases[classname][casename]:
                         case_data += "  "
                     else:

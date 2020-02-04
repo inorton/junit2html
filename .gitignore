@@ -8,3 +8,4 @@ MANIFEST
 *.xml
 *.xml.html
 matrix.html
+*.egg-info
