@@ -2,7 +2,11 @@
 Crude generation of HTML
 """
 
-import cgi
+import sys
+if sys.version_info >= (3, 0):
+    from html import escape
+else:
+    from cgi import escape
 
 
 def text(content):
@@ -14,4 +18,4 @@ def text(content):
     string = ""
     if content is not None:
         string = content
-    return cgi.escape(string)
+    return escape(string)
