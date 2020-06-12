@@ -3,13 +3,13 @@ python27:
   artifacts:
     paths:
     - junit2html*.xml*
-    - junit2htmlreport/tests/*.html
+    - tests/*.html
   script:
    - pip install pytest
-   - python -m pytest -v junit2htmlreport --junitxml=junit2html-py27.xml
+   - python -m pytest -v . --junitxml=junit2html-py27.xml
    - python -m junit2htmlreport junit2html-py27.xml
-   - python -m junit2htmlreport --report-matrix junit2htmlreport/tests/matrix-example.html junit2htmlreport/tests/junit-axis-linux.xml junit2htmlreport/tests/junit-axis-solaris.xml junit2htmlreport/tests/junit-axis-windows.xml
-   - python -m junit2htmlreport --merge junit2html-merged-example.xml junit2htmlreport/tests/junit-unicode.xml junit2htmlreport/tests/junit-unicode2.xml junit2htmlreport/tests/junit-cute2.xml
+   - python -m junit2htmlreport --report-matrix tests/matrix-example.html tests/junit-axis-linux.xml tests/junit-axis-solaris.xml tests/junit-axis-windows.xml
+   - python -m junit2htmlreport --merge junit2html-merged-example.xml tests/junit-unicode.xml tests/junit-unicode2.xml tests/junit-cute2.xml
    - python -m junit2htmlreport junit2html-merged-example.xml
 
 python36:
@@ -17,13 +17,13 @@ python36:
   artifacts:
     paths:
     - junit2html*.xml*
-    - junit2htmlreport/tests/*.html
+    - tests/*.html
   script: 
    - pip install pytest
-   - python -m pytest -v junit2htmlreport --junitxml=junit2html-py36.xml
+   - python -m pytest -v . --junitxml=junit2html-py36.xml
    - python -m junit2htmlreport junit2html-py36.xml
-   - python -m junit2htmlreport --report-matrix junit2htmlreport/tests/matrix-example.html junit2htmlreport/tests/junit-axis-linux.xml junit2htmlreport/tests/junit-axis-solaris.xml junit2htmlreport/tests/junit-axis-windows.xml
-   - python -m junit2htmlreport --merge junit2html-merged-example.xml junit2htmlreport/tests/junit-unicode.xml junit2htmlreport/tests/junit-unicode2.xml junit2htmlreport/tests/junit-cute2.xml
+   - python -m junit2htmlreport --report-matrix tests/matrix-example.html tests/junit-axis-linux.xml tests/junit-axis-solaris.xml tests/junit-axis-windows.xml
+   - python -m junit2htmlreport --merge junit2html-merged-example.xml tests/junit-unicode.xml tests/junit-unicode2.xml tests/junit-cute2.xml
    - python -m junit2htmlreport junit2html-merged-example.xml
 
 
@@ -32,11 +32,11 @@ python38:
   artifacts:
     paths:
     - junit2html*.xml*
-    - junit2htmlreport/tests/*.html
+    - tests/*.html
   script: 
    - pip install pytest
-   - python -m pytest -v junit2htmlreport --junitxml=junit2html-py38.xml
+   - python -m pytest -v . --junitxml=junit2html-py38.xml
    - python -m junit2htmlreport junit2html-py38.xml
-   - python -m junit2htmlreport --report-matrix junit2htmlreport/tests/matrix-example.html junit2htmlreport/tests/junit-axis-linux.xml junit2htmlreport/tests/junit-axis-solaris.xml junit2htmlreport/tests/junit-axis-windows.xml
-   - python -m junit2htmlreport --merge junit2html-merged-example.xml junit2htmlreport/tests/junit-unicode.xml junit2htmlreport/tests/junit-unicode2.xml junit2htmlreport/tests/junit-cute2.xml
+   - python -m junit2htmlreport --report-matrix tests/matrix-example.html tests/junit-axis-linux.xml tests/junit-axis-solaris.xml tests/junit-axis-windows.xml
+   - python -m junit2htmlreport --merge junit2html-merged-example.xml tests/junit-unicode.xml tests/junit-unicode2.xml tests/junit-cute2.xml
    - python -m junit2htmlreport junit2html-merged-example.xml

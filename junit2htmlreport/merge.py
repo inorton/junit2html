@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import os
 from io import BytesIO
 from junit2htmlreport import parser
+from junit2htmlreport.common import ReportContainer
 from junit2htmlreport.textutils import unicode_str
 import xml.etree.ElementTree as ET
 
@@ -22,14 +23,15 @@ def has_xml_header(filepath):
         return first == '<'
 
 
-class Merger(parser.ToJunitXmlBase):
+class Merger(ReportContainer, parser.ToJunitXmlBase):
     """
     Utility class to create a merged junix xml report
     """
     def __init__(self):
+        super(Merger, self).__init__()
         self.suites = []
 
-    def load_report(self, filename):
+    def add_report(self, filename):
         """
         Load a test report or folder
         :param filename:
@@ -37,6 +39,7 @@ class Merger(parser.ToJunitXmlBase):
         """
         if os.path.isfile(filename):
             report = parser.Junit(filename)
+            self.reports[filename] = report
             for suite in report.suites:
                 self.suites.append(suite)
         elif os.path.isdir(filename):
@@ -46,7 +49,7 @@ class Merger(parser.ToJunitXmlBase):
                     filepath = os.path.join(root, filename)
                     if has_xml_header(filepath):
                         try:
-                            self.load_report(filepath)
+                            self.add_report(filepath)
                         except (parser.ParserError, ET.ParseError):
                             pass
 

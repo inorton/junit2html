@@ -6,7 +6,7 @@ Hosted at https://gitlab.com/inorton/junit2html
 This is a simple self-contained python tool to
 produce a single html file from a single junit xml file.
 
-Usage:
+## Basic Usage:
 
 ```
 $ junit2html JUNIT_XML_FILE [NEW_HTML_FILE]
@@ -22,8 +22,23 @@ or
 $ python -m junit2htmlreport pytest-results.xml
 ```
 
-Installation
-------------
+## Advanced Usage:
+
+Render Text summary of results
+
+```
+junit2html mytest-results.xml --summary-matrix
+```
+
+Render Text sumamry of results and exit non-zero on failures
+
+```
+junit2html --summary-matrix ./tests/junit-unicode.xml --max-failures 1
+```
+
+
+# Installation
+
 ```
 $ sudo python setup.py install
 ```
@@ -32,15 +47,13 @@ or
 $ sudo pip install junit2html
 ```
 
-Example Outputs
----------------
+## Example Outputs
 
 You can see junit2html's own test report output content at:
 https://gitlab.com/inorton/junit2html/-/jobs/artifacts/master/browse?job=python36
 
 An an example of the "matrix" report output can be found at:
 https://gitlab.com/inorton/junit2html/-/jobs/artifacts/master/file/junit2htmlreport/tests/matrix-example.html?job=python36
-
 
 
 About Junit

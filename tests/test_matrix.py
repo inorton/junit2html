@@ -1,7 +1,7 @@
 """
 Test the matrix functionality
 """
-from inputfiles import get_filepath
+from .inputfiles import get_filepath
 from junit2htmlreport import matrix
 from junit2htmlreport.matrix import PARTIAL_PASS, PARTIAL_FAIL, TOTAL_FAIL, UNTESTED
 from junit2htmlreport.parser import PASSED, SKIPPED, FAILED

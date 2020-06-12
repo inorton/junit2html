@@ -4,6 +4,7 @@ Handle multiple parsed junit reports
 from __future__ import unicode_literals
 import os
 from junit2htmlreport import parser
+from junit2htmlreport.common import ReportContainer
 from junit2htmlreport.parser import SKIPPED, FAILED, PASSED, ABSENT
 
 UNTESTED = "untested"
@@ -12,13 +13,13 @@ PARTIAL_FAIL = "partial failure"
 TOTAL_FAIL = "total failure"
 
 
-class ReportMatrix(object):
+class ReportMatrix(ReportContainer):
     """
     Load and handle several report files
     """
 
     def __init__(self):
-        self.reports = {}
+        super(ReportMatrix, self).__init__()
         self.cases = {}
         self.classes = {}
         self.casenames = {}

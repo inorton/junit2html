@@ -2,8 +2,9 @@
 Test that does nothing other than import
 """
 import os
-from inputfiles import get_filepath
-from helpers import run_runner
+import pytest
+from .inputfiles import get_filepath
+from .helpers import run_runner
 from junit2htmlreport import parser, runner
 
 
@@ -130,3 +131,14 @@ def test_parser_stringreader():
         assert junit.suites[0].name == "Untitled suite in /Users/niko/Sites/casperjs/tests/suites/casper/agent.js"
         assert junit.suites[0].package == "tests/suites/casper/agent"
         assert junit.suites[0].classes["tests/suites/casper/agent"].cases[1].name == "Default user agent matches /plop/"
+
+
+def test_fail_exit(tmpdir):
+    """
+    Test the tool exits with an error for --max-failures
+    :return:
+    """
+    with pytest.raises(SystemExit) as err:
+        run_runner(tmpdir, "junit-unicode.xml", "--summary-matrix", "--max-failures", "1")
+
+    assert err.value.code != 0
