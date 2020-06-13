@@ -1,0 +1,111 @@
+<testsuite errors="0" failures="1" name="unittest.TestSuite" tests="1" time="73.839">
+  <testcase classname="__main__.TestCase[99]" name="testRdp" time="73.8360">
+    <failure type="exceptions.AssertionError">expectedRet: 0 - realRet: 141
+  File "/home/admin/sikuli/sikuli-ide.jar/Lib/unittest.py", line 260, in run
+    testMethod()
+  File "/home/admin/workspace/main-POC/test/automation-rdpcore/./RDPTest.sikuli/RDPTest.py", line 75, in testRdp
+    myRDP.verifyResult(self.tc["ExpectedReturnCode"], self.tc["ExpectedErrorMsg"])
+  File "/home/admin/workspace/main-POC/test/automation-rdpcore/lib/rdp.sikuli/rdp.py", line 388, in verifyResult
+    assert self.ret == int(expectedRet), "expectedRet: %s - realRet: %s" % (str(expectedRet), str(self.ret))
+    </failure>
+  </testcase>
+  <system-out><![CDATA[xmlrunner: startTest().
+In setUp().
+In testRdp().
+
+=======================================================
+
+===> Executing test case[99]: Stand-alone SH which disables NLA with default setting
+
+Test Case Action: ExitDisconnect
+
+HostOS= 2008r2  , CMD= 10.200.25.179 -u auto1 -p Test#123 -d dellrdp, Actions= ExitDisconnect
+In init().
+IN getImage().
+rdp(): title = rdpclient.png
+running rdp client... ./rdpclient 10.200.25.179 -u auto1 -p Test#123 -d dellrdp --no-color-log
+Searching: RDP initialization has succeeded and ready to start main rdp loop.' to check if RDP session is connected or done.
+until timeout in 20 seconds.
+  0:00:01.027507084:        rdpclient:b514a700:	GStreamer Element/CODEC ' bmmxvimagesink' not found
+
+  0:00:01.027605840:        rdpclient:b514a700:	rdp(): starting
+
+  0:00:01.027648135:         __BASE__:b514a700:	Client Name is 'ubuntu-12.04'
+
+  0:00:01.027753259:         __BASE__:b514a700:	mchannel_init(): thread id 0xb514a700
+
+  0:00:01.028589778:         __BASE__:b514a700:	Connect to the host 10.200.25.179 ...
+
+  0:00:01.028625424:         __BASE__:b514a700:	client_sock_connect(): fqdn=(null) tna=(null) tsgwEnable=0
+
+  0:00:01.036141354:         __BASE__:b514a700:	RDP: NLA CredSSP Authentication
+
+  0:00:01.044063727:         __BASE__:b514a700:	NLA_SSL_connect():300: SSL_get_verify_result=20: unable to get local issuer certificate
+
+  0:00:01.044377460:         __BASE__:b514a700:	NLA_SSL_connect():312: Peer common name (shost6.dellrdp.local) doesn't match host name (10.200.25.179)
+
+  0:00:01.138312578:         __BASE__:b514a700:	Start main send-to-RDP thread...
+
+  0:00:01.138400992:         __BASE__:b514a700:	RDP initialization has succeeded and ready to start main rdp loop.
+
+1.138400992
+Found: RDP initialization has succeeded and ready to start main rdp loop
+Wait for 10 seconds...
+Call performExit().
+HostOD = 2008r2
+In performExit():
+2008r2
+rdpclient.png
+Wait for 15 secs.
+IN getImage().
+IN getImage().
+IN getImage().
+IN getImage().
+IN getImage().
+IN getImage().
+IN getImage().
+IN getImage().
+IN getImage().
+window.png
+IN getImage().
+Call verifyResult().
+IN getImage().
+IN getImage().
+IN getImage().
+Polling the rdpclient process and check if it exits properly in 120 seconds......
+141
+IN getImage().
+IN getImage().
+IN getImage().
+*******************************stdout*******************************
+
+*******************************stderr*******************************
+  0:00:01.027507084:        rdpclient:b514a700:	GStreamer Element/CODEC ' bmmxvimagesink' not found
+  0:00:01.027605840:        rdpclient:b514a700:	rdp(): starting
+  0:00:01.027648135:         __BASE__:b514a700:	Client Name is 'ubuntu-12.04'
+  0:00:01.027753259:         __BASE__:b514a700:	mchannel_init(): thread id 0xb514a700
+  0:00:01.028589778:         __BASE__:b514a700:	Connect to the host 10.200.25.179 ...
+  0:00:01.028625424:         __BASE__:b514a700:	client_sock_connect(): fqdn=(null) tna=(null) tsgwEnable=0
+  0:00:01.036141354:         __BASE__:b514a700:	RDP: NLA CredSSP Authentication
+  0:00:01.044063727:         __BASE__:b514a700:	NLA_SSL_connect():300: SSL_get_verify_result=20: unable to get local issuer certificate
+  0:00:01.044377460:         __BASE__:b514a700:	NLA_SSL_connect():312: Peer common name (shost6.dellrdp.local) doesn't match host name (10.200.25.179)
+  0:00:01.138312578:         __BASE__:b514a700:	Start main send-to-RDP thread...
+  0:00:01.138400992:         __BASE__:b514a700:	RDP initialization has succeeded and ready to start main rdp loop.
+  0:00:01.142691288:         PDU READ:afb15b40:	clt_plat_chal_res(): vchannel sec_license_pkt
+  0:00:01.206414711:         PDU READ:afb15b40:	WARNING: Error opening TS-CAL file to save license: error code 2 (No such file or directory)
+  0:00:01.322600645:         PDU READ:afb15b40:	RDP: Decompression type is RDP 6.1 Bulk
+  0:00:01.323062845:           -MAIN-:b331cb40:	Max gc count: 3
+  0:00:01.329853196:           -MAIN-:b331cb40:	Max gc count: 10
+  0:00:01.545970383:           -MAIN-:b331cb40:	Max gc count: 21
+  0:00:01.547702120:           -MAIN-:b331cb40:	Max gc count: 24
+  0:00:03.173001519:           -MAIN-:b331cb40:	Max gc count: 30
+  0:00:29.063941827:           -MAIN-:b331cb40:	Max gc count: 36
+  0:00:29.402013036:           -MAIN-:b331cb40:	Max gc count: 72
+  0:00:45.667702527:           -MAIN-:b331cb40:	Max gc count: 252
+  0:00:51.223839720:         PDU READ:afb15b40:	mcs_filter(): SERVER HAS TOLD US TO TERMINATE (32)
+
+***ERROR: Unexpected error return code - expectedRet: 0 , realRet: 141
+In tearDown().
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

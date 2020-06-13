@@ -1,0 +1,73 @@
+<testsuites>
+	<testsuite name="All" tests="0">
+	</testsuite>
+	<testsuite name="Platform" tests="0">
+	</testsuite>
+	<testsuite name="IpNet" tests="0">
+	</testsuite>
+	<testsuite name="LinuxIp" tests="10">
+		<testcase classname="LinuxIp" name="ConnectionTestCtorDtor"/>
+		<testcase classname="LinuxIp" name="ConnectionTestThrow"/>
+		<testcase classname="LinuxIp" name="ConnectionTestEraseDefault"/>
+		<testcase classname="LinuxIp" name="CtorDtor"/>
+		<testcase classname="LinuxIp" name="IsSetLarger"/>
+		<testcase classname="LinuxIp" name="Data_driven_equality"/>
+		<testcase classname="LinuxIp" name="SetExceed"/>
+		<testcase classname="LinuxIp" name="SetNegFD"/>
+		<testcase classname="LinuxIp" name="ClrNegFD"/>
+		<testcase classname="LinuxIp" name="IsSetNegFD"/>
+	</testsuite>
+	<testsuite name="String" tests="8">
+		<testcase classname="String" name="ToLower"/>
+		<testcase classname="String" name="Equal"/>
+		<testcase classname="String" name="NotEqual"/>
+		<testcase classname="String" name="TrimRight"/>
+		<testcase classname="String" name="TrimLeft"/>
+		<testcase classname="String" name="TrimCenter"/>
+		<testcase classname="String" name="TrimDefault"/>
+		<testcase classname="String" name="TrimWrong"/>
+	</testsuite>
+	<testsuite name="MultiOs" tests="25">
+		<testcase classname="MultiOs" name="CtorDtor"/>
+		<testcase classname="MultiOs" name="Data_driven_equality_pre"/>
+		<testcase classname="MultiOs" name="Data_driven_equality_post"/>
+		<testcase classname="MultiOs" name="SetMax"/>
+		<testcase classname="MultiOs" name="SetMin"/>
+		<testcase classname="MultiOs" name="SetLarger">
+			<failure message="MultiOS/Enumator.cpp:78 SetLarger: your == T1">
+SetLarger: your == T1
+			</failure>
+		</testcase>
+		<testcase classname="MultiOs" name="SetZero"/>
+		<testcase classname="MultiOs" name="SetMinusOne"/>
+		<testcase classname="MultiOs" name="SetOne"/>
+		<testcase classname="MultiOs" name="Overflow"/>
+		<testcase classname="MultiOs" name="Underflow"/>
+		<testcase classname="MultiOs" name="Wrong"/>
+		<testcase classname="MultiOs" name="CtorDtor"/>
+		<testcase classname="MultiOs" name="Data_driven_equality"/>
+		<testcase classname="MultiOs" name="SetMax"/>
+		<testcase classname="MultiOs" name="SetMin"/>
+		<testcase classname="MultiOs" name="SetZero"/>
+		<testcase classname="MultiOs" name="SetMinusOne">
+			<failure message="MultiOS/Message.cpp:536 &quot;Set value to -1 should throw&quot;">
+&quot;Set value to -1 should throw&quot;
+			</failure>
+		</testcase>
+		<testcase classname="MultiOs" name="MessagePoolTest"/>
+		<testcase classname="MultiOs" name="ReplaceTest"/>
+		<testcase classname="MultiOs" name="SetOverflow">
+			<failure message="MultiOS/Message.cpp:546 &quot;Set value overflow&quot;">
+&quot;Set value overflow&quot;
+			</failure>
+		</testcase>
+		<testcase classname="MultiOs" name="Wrong">
+			<failure message="MultiOS/Message.cpp:554 &quot;Set use to 1 more than alloc&quot;">
+&quot;Set use to 1 more than alloc&quot;
+			</failure>
+		</testcase>
+		<testcase classname="MultiOs" name="ArgShort"/>
+		<testcase classname="MultiOs" name="Arg3"/>
+		<testcase classname="MultiOs" name="ArgClass"/>
+	</testsuite>
+</testsuites>
