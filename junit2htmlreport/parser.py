@@ -30,16 +30,19 @@ class HtmlHeadMixin(object):
     """
     Head a html page
     """
-    def get_css(self):
+    def get_css(self, css):
         """
         Return the content of the css file
         :return:
         """
         thisdir = os.path.dirname(os.path.abspath(__file__))
-        with open(os.path.join(thisdir, "report.css"), "r") as cssfile:
+        if not css:
+            css = os.path.join(thisdir, "report.css")
+
+        with open(css, "r") as cssfile:
             return cssfile.read()
 
-    def get_html_head(self, reportname):
+    def get_html_head(self, reportname, css):
         """
         Get the HTML head
         :return:
@@ -51,7 +54,7 @@ class HtmlHeadMixin(object):
             <style type="text/css">
               {css}
             </style>
-        </head>""".format(css=self.get_css(), name=reportname)
+        </head>""".format(css=self.get_css(css), name=reportname)
 
 
 class ToJunitXmlBase(object):
@@ -572,7 +575,7 @@ class Junit(HtmlHeadMixin):
     Parse a single junit xml report
     """
 
-    def __init__(self, filename=None, xmlstring=None):
+    def __init__(self, css, filename=None, xmlstring=None):
         """
         Parse the file
         :param filename:
@@ -580,6 +583,7 @@ class Junit(HtmlHeadMixin):
         """
         self.filename = filename
         self.tree = None
+        self.css = css
         if filename is not None:
             self.tree = ET.parse(filename)
         elif xmlstring is not None:
@@ -595,7 +599,7 @@ class Junit(HtmlHeadMixin):
         :param reportname:
         :return:
         """
-        return super(Junit, self).get_html_head(reportname)
+        return super(Junit, self).get_html_head(reportname, self.css)
 
     def _read(self, xmlstring):
         """

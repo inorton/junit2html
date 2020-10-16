@@ -34,6 +34,9 @@ PARSER.add_argument("REPORTS", metavar="REPORT", type=str, nargs="+",
 PARSER.add_argument("OUTPUT", type=str, nargs="?",
                     help="Filename to save the html as")
 
+PARSER.add_argument("--stylesheet", dest="stylesheet", type=str, default=None,
+                    help="Apply own Stylesheet")
+
 
 def run(args):
     """
@@ -87,7 +90,7 @@ def run(args):
         else:
             outfilename = opts.REPORTS[0] + ".html"
 
-        report = parser.Junit(args[0])
+        report = parser.Junit(opts.stylesheet, args[0])
         html = report.html()
 
         with open(outfilename, "wb") as outfile:
