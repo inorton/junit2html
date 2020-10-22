@@ -56,7 +56,7 @@ def run(args):
         util = matrix.TextReportMatrix()
         for filename in inputs:
             util.add_report(filename)
-        print(util.summary())
+        print(util.summary().encoding("utf-8"))
     elif opts.html_matrix:
         util = matrix.HtmlReportMatrix(os.path.dirname(opts.html_matrix))
         for filename in inputs:
