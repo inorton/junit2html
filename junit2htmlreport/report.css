@@ -81,7 +81,7 @@ body {
 }
 
 .passed {
-    background-color: limegreen;
+    display: none;
 }
 
 .tooltip {

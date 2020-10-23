@@ -258,6 +258,7 @@ class Case(AnchorBase, ToJunitXmlBase):
         """
         failure = ""
         skipped = ""
+        passed = ""
         stdout = tag.text(self.stdout)
         stderr = tag.text(self.stderr)
 
@@ -278,6 +279,13 @@ class Case(AnchorBase, ToJunitXmlBase):
             </div>
             """.format(msg=tag.text(self.failure_msg),
                        fail=tag.text(self.failure))
+
+        if self.outcome() == PASSED:
+            passed = """
+            <hr size="1"/>
+            <div class="passed"><b>Passed!</b><br/>
+            </div>
+            """.format()
 
         properties = [x.html() for x in self.properties]
 
@@ -302,6 +310,7 @@ class Case(AnchorBase, ToJunitXmlBase):
             </div>
             {skipped}
             {failure}
+            {passed}
             <hr size="1"/>
             {properties}
             {stdoe}
@@ -313,6 +322,7 @@ class Case(AnchorBase, ToJunitXmlBase):
                    duration=self.duration,
                    failure=failure,
                    skipped=skipped,
+                   passed=passed,
                    properties="".join(properties),
                    stdoe=render_stdoe())
 
