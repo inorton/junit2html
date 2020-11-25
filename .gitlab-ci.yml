@@ -1,42 +1,29 @@
-python27:
-  image: python:2.7
+.common:
+  before_script:
+    - pip install pytest
+  script:
+    - python -m pytest -v . --junitxml=junit2html-${CI_JOB_NAME}.xml
+    - python -m junit2htmlreport junit2html-${CI_JOB_NAME}.xml
+    - python -m junit2htmlreport --report-matrix tests/matrix-example.html tests/junit-axis-linux.xml tests/junit-axis-solaris.xml tests/junit-axis-windows.xml
+    - python -m junit2htmlreport --merge junit2html-merged-example.xml tests/junit-unicode.xml tests/junit-unicode2.xml tests/junit-cute2.xml
+    - python -m junit2htmlreport junit2html-merged-example.xml
   artifacts:
     paths:
-    - junit2html*.xml*
-    - tests/*.html
-  script:
-   - pip install pytest
-   - python -m pytest -v . --junitxml=junit2html-py27.xml
-   - python -m junit2htmlreport junit2html-py27.xml
-   - python -m junit2htmlreport --report-matrix tests/matrix-example.html tests/junit-axis-linux.xml tests/junit-axis-solaris.xml tests/junit-axis-windows.xml
-   - python -m junit2htmlreport --merge junit2html-merged-example.xml tests/junit-unicode.xml tests/junit-unicode2.xml tests/junit-cute2.xml
-   - python -m junit2htmlreport junit2html-merged-example.xml
+      - junit2html*.xml*
+      - tests/*.html
+
+python27:
+  image: python:2.7
+  extends: .common
 
 python36:
   image: python:3.6
-  artifacts:
-    paths:
-    - junit2html*.xml*
-    - tests/*.html
-  script: 
-   - pip install pytest
-   - python -m pytest -v . --junitxml=junit2html-py36.xml
-   - python -m junit2htmlreport junit2html-py36.xml
-   - python -m junit2htmlreport --report-matrix tests/matrix-example.html tests/junit-axis-linux.xml tests/junit-axis-solaris.xml tests/junit-axis-windows.xml
-   - python -m junit2htmlreport --merge junit2html-merged-example.xml tests/junit-unicode.xml tests/junit-unicode2.xml tests/junit-cute2.xml
-   - python -m junit2htmlreport junit2html-merged-example.xml
-
+  extends: .common
 
 python38:
   image: python:3.8
-  artifacts:
-    paths:
-    - junit2html*.xml*
-    - tests/*.html
-  script: 
-   - pip install pytest
-   - python -m pytest -v . --junitxml=junit2html-py38.xml
-   - python -m junit2htmlreport junit2html-py38.xml
-   - python -m junit2htmlreport --report-matrix tests/matrix-example.html tests/junit-axis-linux.xml tests/junit-axis-solaris.xml tests/junit-axis-windows.xml
-   - python -m junit2htmlreport --merge junit2html-merged-example.xml tests/junit-unicode.xml tests/junit-unicode2.xml tests/junit-cute2.xml
-   - python -m junit2htmlreport junit2html-merged-example.xml
+  extends: .common
+
+python39:
+  image: python:3.9
+  extends: .common
