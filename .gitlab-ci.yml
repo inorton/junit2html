@@ -1,6 +1,6 @@
 .common:
   before_script:
-    - pip install pytest
+    - pip install pytest wheel
   script:
     - python -m pytest -v . --junitxml=junit2html-job-${CI_JOB_NAME}.xml
     - python -m junit2htmlreport junit2html-job-${CI_JOB_NAME}.xml
