@@ -32,3 +32,9 @@ python38:
 python39:
   image: python:3.9
   extends: .common
+
+coverage:
+  image: python:3.9
+  script:
+    - pip install pytest pytest-cov
+    - python3 -m pytest --cov-fail-under=86 --cov=junit2htmlreport  .
