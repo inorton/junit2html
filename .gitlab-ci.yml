@@ -7,10 +7,12 @@
     - python -m junit2htmlreport --report-matrix tests/matrix-example.html tests/junit-axis-linux.xml tests/junit-axis-solaris.xml tests/junit-axis-windows.xml
     - python -m junit2htmlreport --merge junit2html-merged-example.xml tests/junit-unicode.xml tests/junit-unicode2.xml tests/junit-cute2.xml
     - python -m junit2htmlreport junit2html-merged-example.xml
+    - python setup.py bdist_wheel
   artifacts:
     paths:
       - junit2html*.xml*
       - tests/*.html
+      - dist/*.whl
     reports:
       junit:
         - junit2html-job-*.xml
