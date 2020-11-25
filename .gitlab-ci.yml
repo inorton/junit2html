@@ -2,8 +2,8 @@
   before_script:
     - pip install pytest
   script:
-    - python -m pytest -v . --junitxml=junit2html-${CI_JOB_NAME}.xml
-    - python -m junit2htmlreport junit2html-${CI_JOB_NAME}.xml
+    - python -m pytest -v . --junitxml=junit2html-job-${CI_JOB_NAME}.xml
+    - python -m junit2htmlreport junit2html-job-${CI_JOB_NAME}.xml
     - python -m junit2htmlreport --report-matrix tests/matrix-example.html tests/junit-axis-linux.xml tests/junit-axis-solaris.xml tests/junit-axis-windows.xml
     - python -m junit2htmlreport --merge junit2html-merged-example.xml tests/junit-unicode.xml tests/junit-unicode2.xml tests/junit-cute2.xml
     - python -m junit2htmlreport junit2html-merged-example.xml
@@ -11,6 +11,9 @@
     paths:
       - junit2html*.xml*
       - tests/*.html
+    reports:
+      junit:
+        - junit2html-job-*.xml
 
 python27:
   image: python:2.7
