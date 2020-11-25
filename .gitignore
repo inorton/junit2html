@@ -3,6 +3,7 @@ build/
 .idea/
 .cache/
 .venv/
+venv/
 MANIFEST
 .coverage
 *.xml
