@@ -19,10 +19,11 @@ def test_case_tojunit_failed():
     testcase.failure_msg = "failed message"
 
     result = testcase.tojunit()
-    assert len(result.getchildren()) == 1
-    assert result.getchildren()[0].tag == "failure"
-    assert result.getchildren()[0].text == "bad"
-    assert result.getchildren()[0].get("message") == "failed message"
+    children = list(result)
+    assert len(children) == 1
+    assert children[0].tag == "failure"
+    assert children[0].text == "bad"
+    assert children[0].get("message") == "failed message"
 
 
 def test_case_tojunit():
@@ -46,15 +47,15 @@ def test_case_tojunit():
     assert result.get("time") == "3.0"
     assert result.get("classname") == "myclass"
     assert result.get("name") == "mytest"
-
-    assert len(result.getchildren()) == 3
-    assert result.getchildren()[0].tag == "system-err"
-    assert result.getchildren()[0].text == "byee"
-    assert result.getchildren()[1].tag == "system-out"
-    assert result.getchildren()[1].text == "hello\nworld"
-    assert result.getchildren()[2].tag == "skipped"
-    assert result.getchildren()[2].get("message") == "skipped message"
-    assert result.getchildren()[2].text == "ignored"
+    children = list(result)
+    assert len(children) == 3
+    assert children[0].tag == "system-err"
+    assert children[0].text == "byee"
+    assert children[1].tag == "system-out"
+    assert children[1].text == "hello\nworld"
+    assert children[2].tag == "skipped"
+    assert children[2].get("message") == "skipped message"
+    assert children[2].text == "ignored"
 
 
 def test_merge():

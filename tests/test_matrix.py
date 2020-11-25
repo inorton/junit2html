@@ -2,7 +2,7 @@
 Test the matrix functionality
 """
 from .inputfiles import get_filepath
-from junit2htmlreport import matrix, runner
+from junit2htmlreport import matrix
 from junit2htmlreport.matrix import PARTIAL_PASS, PARTIAL_FAIL, TOTAL_FAIL, UNTESTED
 from junit2htmlreport.parser import PASSED, SKIPPED, FAILED
 
@@ -70,11 +70,3 @@ def test_matrix_html(tmpdir):
 
     assert result.endswith("</html>")
 
-
-def test_matrix_stdout(capsys):
-    runner.run(["--summary-matrix", get_filepath("junit-unicode.xml")])
-
-    out, err = capsys.readouterr()
-
-    assert "A Class with a cent ¢" in out
-    assert "Euro € Test Case" in out
