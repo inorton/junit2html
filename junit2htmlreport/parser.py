@@ -535,7 +535,8 @@ class Suite(AnchorBase, ToJunitXmlBase):
 
         return """
         <div class="testsuite">
-            <h2>Test Suite: {name}</h2><a name="{anchor}">
+            <a name="{anchor}"></a>
+            <h2>Test Suite: {name}</h2>
             {package}
             {properties}
             <table>
