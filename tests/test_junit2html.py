@@ -142,3 +142,22 @@ def test_fail_exit(tmpdir):
         run_runner(tmpdir, "junit-unicode.xml", "--summary-matrix", "--max-failures", "1")
 
     assert err.value.code != 0
+
+
+def test_css_output():
+    """
+    Test that css is output correctly
+    """
+    junit = parser.Junit(filename=get_filepath("junit-unicode.xml"))
+    css = junit.get_css()
+    assert ".result-stats" in css
+
+
+def test_override_css_output():
+    """
+    Test that the alternative CSS file can be used
+    """
+    junit = parser.Junit(filename=get_filepath("junit-unicode.xml"))
+    junit.set_css(get_filepath(".gitignore"))
+    assert "*.html" in junit.get_css()
+

@@ -30,13 +30,25 @@ class HtmlHeadMixin(object):
     """
     Head a html page
     """
+    def set_css(self, filepath):
+        """
+        Set the path to a custom CSS file
+        """
+        setattr(self, "css", filepath)
+
     def get_css(self):
         """
         Return the content of the css file
         :return:
         """
         thisdir = os.path.dirname(os.path.abspath(__file__))
-        with open(os.path.join(thisdir, "report.css"), "r") as cssfile:
+        cssfilepath = os.path.join(thisdir, "report.css")
+        if hasattr(self, "css"):
+            custom = getattr(self, "css")
+            if custom:
+                cssfilepath = custom
+
+        with open(cssfilepath, "r") as cssfile:
             return cssfile.read()
 
     def get_html_head(self, reportname):

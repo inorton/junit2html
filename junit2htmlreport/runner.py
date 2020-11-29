@@ -28,6 +28,10 @@ PARSER.add_argument("--merge", dest="merge_output", type=str,
                     metavar="NEWREPORT",
                     help="Merge multiple test results into one file")
 
+PARSER.add_argument("--stylesheet", dest="stylesheet", type=str,
+                    metavar="CSSFILE", default=None,
+                    help="Supply custom stylesheet content from CSSFILE")
+
 PARSER.add_argument("REPORTS", metavar="REPORT", type=str, nargs="+",
                     help="Test file to read")
 
@@ -59,6 +63,7 @@ def run(args):
         print(util.summary())
     elif opts.html_matrix:
         util = matrix.HtmlReportMatrix(os.path.dirname(opts.html_matrix))
+        util.set_css(opts.stylesheet)
         for filename in inputs:
             util.add_report(filename)
         with open(opts.html_matrix, "w") as outfile:
@@ -88,6 +93,7 @@ def run(args):
             outfilename = opts.REPORTS[0] + ".html"
 
         report = parser.Junit(args[0])
+        report.set_css(opts.stylesheet)
         html = report.html()
 
         with open(outfilename, "wb") as outfile:
