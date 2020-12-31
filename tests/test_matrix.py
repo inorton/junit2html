@@ -1,7 +1,8 @@
 """
 Test the matrix functionality
 """
-from .inputfiles import get_filepath
+import os
+from .inputfiles import get_filepath, HERE
 from junit2htmlreport import matrix
 from junit2htmlreport.matrix import PARTIAL_PASS, PARTIAL_FAIL, TOTAL_FAIL, UNTESTED
 from junit2htmlreport.parser import PASSED, SKIPPED, FAILED
@@ -63,10 +64,14 @@ def test_matrix_html(tmpdir):
     htmatrix = matrix.HtmlReportMatrix(str(tmpdir))
     htmatrix.add_report(get_filepath("junit-simple_suite.xml"))
     htmatrix.add_report(get_filepath("junit-simple_suites.xml"))
-
-    assert len(htmatrix.reports) == 2
+    htmatrix.add_report(get_filepath("junit-unicode.xml"))
+    htmatrix.add_report(get_filepath("junit-axis-linux.xml"))
+    assert len(htmatrix.reports) == 4
 
     result = htmatrix.summary()
+
+    with open(os.path.join(HERE, "test_matrix.html"), "w") as mf:
+        mf.write(result)
 
     assert result.endswith("</html>")
 

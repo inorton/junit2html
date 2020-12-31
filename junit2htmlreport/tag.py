@@ -1,8 +1,8 @@
 """
 Crude generation of HTML
 """
-
 import sys
+
 if sys.version_info >= (3, 0):
     from html import escape
 else:
@@ -19,3 +19,5 @@ def text(content):
     if content is not None:
         string = content
     return escape(string)
+
+

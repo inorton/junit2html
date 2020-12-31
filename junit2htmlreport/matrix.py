@@ -3,9 +3,10 @@ Handle multiple parsed junit reports
 """
 from __future__ import unicode_literals
 import os
-from junit2htmlreport import parser
-from junit2htmlreport.common import ReportContainer
-from junit2htmlreport.parser import SKIPPED, FAILED, PASSED, ABSENT
+from . import parser
+from .common import ReportContainer
+from .parser import SKIPPED, FAILED, PASSED, ABSENT
+from .render import HTMLMatrix, HTMLReport
 
 UNTESTED = "untested"
 PARTIAL_PASS = "partial pass"
@@ -24,6 +25,16 @@ class ReportMatrix(ReportContainer):
         self.classes = {}
         self.casenames = {}
         self.result_stats = {}
+        self.case_results = {}
+
+    def add_case_result(self, case):
+        testclass = case.testclass.name
+        casename = case.name
+        if testclass not in self.case_results:
+            self.case_results[testclass] = {}
+        if casename not in self.case_results[testclass]:
+            self.case_results[testclass][casename] = []
+        self.case_results[testclass][casename].append(case.outcome())
 
     def report_order(self):
         return sorted(self.reports.keys())
@@ -66,7 +77,7 @@ class ReportMatrix(ReportContainer):
 
                 for testcase in self.classes[testclass][filename].cases:
                     basename = testcase.basename().strip()
-                    if basename not in self.casenames:
+                    if basename not in self.casenames[testclass]:
                         self.casenames[testclass].append(basename)
 
                     if testclass not in self.cases:
@@ -76,6 +87,8 @@ class ReportMatrix(ReportContainer):
                     self.cases[testclass][basename][filename] = testcase
 
                     outcome = testcase.outcome()
+                    self.add_case_result(testcase)
+
                     self.result_stats[outcome] = 1 + self.result_stats.get(
                         outcome, 0)
 
@@ -106,7 +119,7 @@ class ReportMatrix(ReportContainer):
         return " ", ""
 
 
-class HtmlReportMatrix(ReportMatrix, parser.HtmlHeadMixin):
+class HtmlReportMatrix(ReportMatrix):
     """
     Render a matrix report as html
     """
@@ -123,8 +136,8 @@ class HtmlReportMatrix(ReportMatrix, parser.HtmlHeadMixin):
         basename = os.path.basename(filename)
         # make the individual report too
         report = self.reports[basename].html()
-        with open(os.path.join(self.outdir, basename) + ".html",
-                  "w") as filehandle:
+        with open(
+                os.path.join(self.outdir, basename) + ".html", "w") as filehandle:
             filehandle.write(report)
 
     def get_stats_table(self):
@@ -144,114 +157,19 @@ class HtmlReportMatrix(ReportMatrix, parser.HtmlHeadMixin):
             return "ok"
         return super(HtmlReportMatrix, self).short_outcome(outcome)
 
+    def short_axis(self, axis):
+        if axis.endswith(".xml"):
+            return axis[:-4]
+        return axis
+
     def summary(self):
         """
         Render the html
         :return:
         """
-        output = self.get_html_head("")
-        output += "<body>"
-        output += "<h2>Reports Matrix</h2><hr size='1'/>"
+        html_matrix = HTMLMatrix(self)
 
-        # table headers,
-        #
-        #          report 1
-        #          |  report 2
-        #          |  |  report 3
-        #          |  |  |
-        #   test1  f  /  s  % Partial Failure
-        #   test2  s  /  -  % Partial Pass
-        #   test3  /  /  /  * Pass
-        output += "<table class='test-matrix'>"
-
-        def make_underskip(length):
-            return "<td align='middle'>&#124;</td>" * length
-
-        spansize = 1 + len(self.reports)
-        report_headers = 0
-
-        shown_stats = False
-
-        stats = self.get_stats_table()
-
-        for axis in self.report_order():
-            label = axis
-            if label.endswith(".xml"):
-                label = label[:-4]
-            underskip = make_underskip(report_headers)
-
-            header = "<td colspan='{}'><pre>{}</pre></td>".format(spansize,
-                                                                  label)
-            spansize -= 1
-            report_headers += 1
-            first_cell = ""
-            if not shown_stats:
-                # insert the stats table
-                first_cell = "<td rowspan='{}'>{}</td>".format(
-                    len(self.report_order()),
-                    stats
-                )
-                shown_stats = True
-
-            output += "<tr>{}{}{}</tr>".format(first_cell,
-                                               underskip, header)
-
-        output += "<tr><td></td>{}</tr>".format(
-            make_underskip(len(self.reports)))
-
-        # iterate each class
-        for classname in self.classes:
-            # new class
-            output += "<tr class='testclass'><td colspan='{}'>{}</td></tr>\n".format(
-                len(self.reports) + 2,
-                classname)
-
-            # print the case name
-            for casename in sorted(set(self.casenames[classname])):
-                output += "<tr class='testcase'><td width='16'>-&nbsp;{}</td>".format(casename)
-
-                case_results = []
-
-                # print each test and its result for each axis
-                celltds = ""
-                for axis in self.report_order():
-                    cellclass = ABSENT
-                    anchor = None
-                    if axis not in self.cases[classname][casename]:
-                        cell = "&nbsp;"
-                    else:
-                        testcase = self.cases[classname][casename][axis]
-                        anchor = testcase.anchor()
-
-                        cellclass = testcase.outcome()
-                        cell = self.short_outcome(cellclass)
-                    case_results.append(cellclass)
-
-                    cell = "<a class='tooltip-parent testcase-link' href='{}.html#{}'>{}{}</a>".format(
-                        axis, anchor, cell,
-                        "<div class='tooltip'>({}) {}</div>".format(
-                            cellclass.title(),
-                            axis)
-                    )
-                    if cellclass == ABSENT:
-                        cell = ""
-
-                    celltds += "<td class='testcase-cell {}'>{}</td>".format(
-                        cellclass,
-                        cell)
-
-                combined_name = self.combined_result(case_results)[1]
-
-                output += celltds
-                output += "<td span class='testcase-combined'>{}</td>".format(
-                    combined_name
-                )
-                output += "</tr>"
-
-        output += "</table>"
-        output += "</body>"
-        output += "</html>"
-        return output
+        return str(html_matrix)
 
 
 class TextReportMatrix(ReportMatrix):
@@ -298,7 +216,6 @@ class TextReportMatrix(ReportMatrix):
 
                 # print each test and its result for each axis
                 case_data = ""
-                case_results = []
                 for axis in self.report_order():
                     if axis not in self.cases[classname][casename]:
                         case_data += "  "
@@ -306,15 +223,13 @@ class TextReportMatrix(ReportMatrix):
                         testcase = self.cases[classname][casename][axis]
                         if testcase.skipped:
                             case_data += "s "
-                            case_results.append(SKIPPED)
                         elif testcase.failure:
                             case_data += "f "
-                            case_results.append(FAILED)
                         else:
                             case_data += "/ "
-                            self.append = case_results.append(PASSED)
 
-                combined, combined_name = self.combined_result(case_results)
+                combined, combined_name = self.combined_result(
+                    self.case_results[classname][testcase.name])
 
                 output += case_data
                 output += " {} {}\n".format(combined, combined_name)

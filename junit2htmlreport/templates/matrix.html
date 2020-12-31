@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>
+    Reports Matrix
+</h1>
+
+<table class="matrix-table">
+    {% set report_names = matrix.report_order() %}
+    {% set n_reports = report_names.__len__() %}
+    <tr><!-- top row, stats and each matrix axis -->
+        <td rowspan="{{n_reports + 1}}"> <!-- stats -->
+            <table class="stats-table">
+                {% for outcome in matrix.result_stats %}
+                <tr><th class="{{outcome}}">{{outcome.title()}}</th><td>{{matrix.result_stats[outcome]}}</td></tr>
+                {% endfor %}
+            </table>
+        </td>
+
+        <td colspan="{{n_reports}}" class="matrix-axis-name">
+            <a href="{{report_names[0]}}.html">{{matrix.short_axis(report_names[0])}}</a>
+        </td>
+    </tr>
+        <!-- matrix column index - {{report_names}} -->
+    {% for i in range(n_reports - 1) %}
+    <tr>
+        {% for n in range(1 + i) %}
+        <td class="matrix-axis-line"> </td>
+        {% endfor %}
+        <td colspan="{{n_reports - 1 - i}}" class="matrix-axis-name">
+            <a href="{{report_names[i + 1]}}.html">{{matrix.short_axis(report_names[i + 1])}}</a>
+        </td>
+    </tr>
+    {% endfor %}
+    <tr>
+        {% for n in range(n_reports) %}
+        <td class="matrix-axis-line"> </td>
+        {% endfor %}
+    </tr>
+
+    <!-- test results by class/test -->
+    {% for classname in matrix.classes %}
+    <tr>
+        <th class="matrix-classname">{{classname}}</th>
+        {% for n in range(n_reports) %}
+        <td class="matrix-axis-line"> </td>
+        {% endfor %}
+    </tr>
+        {% for casename in matrix.casenames[classname] %}
+        <tr>
+            <th class="matrix-casename">{{casename}}</th>
+            {% for axis in report_names %}
+                {% set xcase = matrix.cases[classname][casename] %}
+                <td class="matrix-axis-line">
+                    {% if axis in xcase %}
+                    <a href="{{axis}}.html#{{xcase[axis].anchor()}}">
+                    <span class="matrix-result matrix-result-{{xcase[axis].outcome()}}">
+                        {{ matrix.short_outcome(xcase[axis].outcome()) }}
+                    </span>
+                    </a>
+                    {% endif %}
+
+                </td>
+            {% endfor %}
+        {% endfor %}
+        </tr>
+    {% endfor %}
+
+</table>
+{% endblock %}

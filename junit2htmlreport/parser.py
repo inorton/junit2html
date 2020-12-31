@@ -2,11 +2,13 @@
 Parse a junit report file into a family of objects
 """
 from __future__ import unicode_literals
+
+import os
 import xml.etree.ElementTree as ET
 import collections
-from junit2htmlreport import tag
-from junit2htmlreport.textutils import unicode_str
-import os
+from . import tag
+from .textutils import unicode_str
+from .render import HTMLReport
 import uuid
 
 
@@ -24,34 +26,6 @@ class ParserError(Exception):
     """
     def __init__(self, message):
         super(ParserError, self).__init__(message)
-
-
-class HtmlHeadMixin(object):
-    """
-    Head a html page
-    """
-    def get_css(self):
-        """
-        Return the content of the css file
-        :return:
-        """
-        thisdir = os.path.dirname(os.path.abspath(__file__))
-        with open(os.path.join(thisdir, "report.css"), "r") as cssfile:
-            return cssfile.read()
-
-    def get_html_head(self, reportname):
-        """
-        Get the HTML head
-        :return:
-        """
-        return """
-        <html>
-        <head>
-            <title>{name} - Junit Test Report</title>
-            <style type="text/css">
-              {css}
-            </style>
-        </head>""".format(css=self.get_css(), name=reportname)
 
 
 class ToJunitXmlBase(object):
@@ -89,6 +63,9 @@ class AnchorBase(object):
     def __init__(self):
         self._anchor = None
 
+    def id(self):
+        return self.anchor()
+
     def anchor(self):
         """
         Generate a html anchor name
@@ -107,28 +84,6 @@ class Class(AnchorBase):
         super(Class, self).__init__()
         self.name = None
         self.cases = list()
-
-    def html(self):
-        """
-        Render this test class as html
-        :return:
-        """
-        cases = [x.html() for x in self.cases]
-
-        return """
-        <hr size="2"/>
-        <a name="{anchor}">
-        <div class="testclass">
-            <div>Test Class: {name}</div>
-            <div class="testcases">
-            {cases}
-            </div>
-        </div>
-        </a>
-        """.format(anchor=self.anchor(),
-                   name=tag.text(self.name),
-                   count=len(cases),
-                   cases="".join(cases))
 
 
 class Property(AnchorBase, ToJunitXmlBase):
@@ -149,16 +104,6 @@ class Property(AnchorBase, ToJunitXmlBase):
         prop.set(u"name", unicode_str(self.name))
         prop.set(u"value", unicode_str(self.value))
         return prop
-
-    def html(self):
-        """
-       Render those properties as html
-       :return:
-       """
-        return """
-        <div class="property"><i>{name}</i><br/>
-        <pre>{value}</pre></div>
-        """.format(name=tag.text(self.name), value=tag.text(self.value))
 
 
 class Case(AnchorBase, ToJunitXmlBase):
@@ -189,6 +134,13 @@ class Case(AnchorBase, ToJunitXmlBase):
         elif self.failed():
             return FAILED
         return PASSED
+
+    def prefix(self):
+        if self.skipped:
+            return "[S]"
+        if self.failed():
+            return "[F]"
+        return ""
 
     def tojunit(self):
         """
@@ -250,71 +202,6 @@ class Case(AnchorBase, ToJunitXmlBase):
         :return:
         """
         return self.failure is not None
-
-    def html(self):
-        """
-        Render this test case as HTML
-        :return:
-        """
-        failure = ""
-        skipped = ""
-        stdout = tag.text(self.stdout)
-        stderr = tag.text(self.stderr)
-
-        if self.skipped:
-            skipped = """
-            <hr size="1"/>
-            <div class="skipped"><b>Skipped: {msg}</b><br/>
-                <pre>{skip}</pre>
-            </div>
-            """.format(msg=tag.text(self.skipped_msg),
-                       skip=tag.text(self.skipped))
-
-        if self.failed():
-            failure = """
-            <hr size="1"/>
-            <div class="failure"><b>Failed: {msg}</b><br/>
-                <pre>{fail}</pre>
-            </div>
-            """.format(msg=tag.text(self.failure_msg),
-                       fail=tag.text(self.failure))
-
-        properties = [x.html() for x in self.properties]
-
-        def render_stdoe():
-            if self.stderr or self.stdout:
-                return """
-            <div class="stdout"><i>Stdout</i><br/>
-                <pre>{stdout}</pre></div>
-            <hr size="1"/>
-            <div class="stderr"><i>Stderr</i><br/>
-                <pre>{stderr}</pre></div>
-                """.format(stderr=stderr, stdout=stdout)
-            return ""
-
-        return """
-    <a name="{anchor}">
-        <div class="testcase">
-            <div class="details">
-                <span class="testname"><b>{testname}</b></span><br/>
-                <span class="testclassname">{testclassname}</span><br/>
-                <span class="duration">Time Taken: {duration}s</span>
-            </div>
-            {skipped}
-            {failure}
-            <hr size="1"/>
-            {properties}
-            {stdoe}
-        </div>
-    </a>
-        """.format(anchor=self.anchor(),
-                   testname=self.name,
-                   testclassname=self.testclass.name,
-                   duration=self.duration,
-                   failure=failure,
-                   skipped=skipped,
-                   properties="".join(properties),
-                   stdoe=render_stdoe())
 
 
 class Suite(AnchorBase, ToJunitXmlBase):
@@ -567,7 +454,7 @@ class Suite(AnchorBase, ToJunitXmlBase):
                    fails=len(self.failed()))
 
 
-class Junit(HtmlHeadMixin):
+class Junit(object):
     """
     Parse a single junit xml report
     """
@@ -589,13 +476,8 @@ class Junit(HtmlHeadMixin):
         self.suites = []
         self.process()
 
-    def get_html_head(self, reportname):
-        """
-        Make the file header
-        :param reportname:
-        :return:
-        """
-        return super(Junit, self).get_html_head(reportname)
+    def __iter__(self):
+        return self.suites.__iter__()
 
     def _read(self, xmlstring):
         """
@@ -636,7 +518,7 @@ class Junit(HtmlHeadMixin):
             cursuite.name = suitename
             if "package" in suite.attrib:
                 cursuite.package = suite.attrib["package"]
-            cursuite.duration = float(suite.attrib.get("time", '0').replace(',',''))
+            cursuite.duration = float(suite.attrib.get("time", '0').replace(',', ''))
 
             for element in suite:
                 if element.tag == "error":
@@ -709,33 +591,12 @@ class Junit(HtmlHeadMixin):
                                 newproperty.value = property.attrib["value"]
                                 newcase.properties.append(newproperty)
 
-    def toc(self):
-        """
-        If this report has multiple suite results, make a table of contents listing each suite
-        :return:
-        """
-        if len(self.suites) > 1:
-            tochtml = "<ul>"
-            for suite in self.suites:
-                tochtml += '<li><a href="#{anchor}">{name}</a></li>'.format(
-                        anchor=suite.anchor(),
-                        name=tag.text(suite.name))
-            tochtml += "</ul>"
-            return tochtml
-        else:
-            return ""
-
     def html(self):
         """
         Render the test suite as a HTML report with links to errors first.
         :return:
         """
 
-        page = self.get_html_head(self.filename)
-        page += "<body><h1>Test Report</h1>"
-        page += self.toc()
-        for suite in self.suites:
-            page += suite.html()
-        page += "</body></html>"
-
-        return page
+        doc = HTMLReport()
+        doc.load(self, os.path.basename(self.filename))
+        return str(doc)

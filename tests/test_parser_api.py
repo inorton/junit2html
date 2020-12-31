@@ -48,6 +48,6 @@ def test_public_api():
     html = container.html()
 
     assert html
-    assert "<html>" in html
-    assert """<span class="testname"><b>test_skippy</b></span><br/>""" in html
-    assert """<div class="failure"><b>Failed: an exception happened</b><br/>""" in html
+    assert "<html" in html
+    assert """test_skippy""" in html
+    assert """an exception happened""" in html
