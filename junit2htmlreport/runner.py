@@ -89,9 +89,11 @@ def run(args):
 
         report = parser.Junit(args[0])
         html = report.html()
-
-        with open(outfilename, "wb") as outfile:
-            outfile.write(html.encode('utf-8'))
+        if report.filename is not None:
+            with open(outfilename, "wb") as outfile:
+                outfile.write(html.encode('utf-8'))
+        else:
+            print(html.encode('utf-8'))
 
 
 def start():
