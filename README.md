@@ -11,6 +11,10 @@ produce a single html file from a single junit xml file.
 ```
 $ junit2html JUNIT_XML_FILE [NEW_HTML_FILE]
 ```
+or
+```
+$ python -m junit2htmlreport JUNIT_XML_FILE [NEW_HTML_FILE]
+```
 
 eg:
 
