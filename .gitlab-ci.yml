@@ -2,6 +2,7 @@
   before_script:
     - pip install pytest wheel
   script:
+    - python -m pip install -e .
     - python -m pytest -v . --junitxml=junit2html-job-${CI_JOB_NAME}.xml
     - python -m junit2htmlreport junit2html-job-${CI_JOB_NAME}.xml
     - python -m junit2htmlreport --report-matrix tests/matrix-example.html tests/junit-axis-linux.xml tests/junit-axis-solaris.xml tests/junit-axis-windows.xml
