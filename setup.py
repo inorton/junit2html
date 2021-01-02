@@ -8,7 +8,7 @@ files = [os.path.join("templates", "*.css"),
 
 setup(
     name="junit2html",
-    version="30.0.3",
+    version="30.1.1",
     description="Generate HTML reports from Junit results",
     author="Ian Norton",
     author_email="inorton@gmail.com",

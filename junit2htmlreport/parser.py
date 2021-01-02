@@ -4,6 +4,7 @@ Parse a junit report file into a family of objects
 from __future__ import unicode_literals
 
 import os
+import sys
 import xml.etree.ElementTree as ET
 import collections
 from .textutils import unicode_str
@@ -305,9 +306,15 @@ class Junit(object):
         :return:
         """
         self.filename = filename
+        if filename == "-":
+            # read the xml from stdin
+            stdin = sys.stdin.read()
+            xmlstring = stdin
+            self.filename = None
+
         self.tree = None
-        if filename is not None:
-            self.tree = ET.parse(filename)
+        if self.filename is not None:
+            self.tree = ET.parse(self.filename)
         elif xmlstring is not None:
             self._read(xmlstring)
         else:
@@ -439,5 +446,9 @@ class Junit(object):
         """
 
         doc = HTMLReport()
-        doc.load(self, os.path.basename(self.filename))
+        title = "Test Results"
+        if self.filename:
+            if os.path.exists(self.filename):
+                title = os.path.basename(self.filename)
+        doc.load(self, title=title)
         return str(doc)
