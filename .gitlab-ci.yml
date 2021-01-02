@@ -9,6 +9,7 @@
     - python -m junit2htmlreport --merge junit2html-merged-example.xml tests/junit-unicode.xml tests/junit-unicode2.xml tests/junit-cute2.xml
     - python -m junit2htmlreport junit2html-merged-example.xml
     - python setup.py bdist_wheel
+    - python -m junit2htmlreport --summary-matrix - < junit2html-job-${CI_JOB_NAME}.xml
   artifacts:
     paths:
       - junit2html*.xml*
