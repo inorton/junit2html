@@ -140,18 +140,6 @@ class HtmlReportMatrix(ReportMatrix):
                 os.path.join(self.outdir, basename) + ".html", "w") as filehandle:
             filehandle.write(report)
 
-    def get_stats_table(self):
-        stats = "<table class='result-stats'>"
-        for outcome in sorted(self.result_stats.keys()):
-            stats += "<tr><th class='{}'>{}<th>" \
-                     "<td align='right'>{}</td></tr>".format(
-                outcome,
-                outcome.title(),
-                self.result_stats[outcome]
-            )
-        stats += "</table>"
-        return stats
-
     def short_outcome(self, outcome):
         if outcome == PASSED:
             return "ok"

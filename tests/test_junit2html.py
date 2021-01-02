@@ -142,3 +142,14 @@ def test_fail_exit(tmpdir):
         run_runner(tmpdir, "junit-unicode.xml", "--summary-matrix", "--max-failures", "1")
 
     assert err.value.code != 0
+
+
+def test_skip_exit(tmpdir):
+    """
+    Test the tool exits with an error for --max-skipped
+    :return:
+    """
+    with pytest.raises(SystemExit) as err:
+        run_runner(tmpdir, "junit-axis-windows.xml", "--summary-matrix", "--max-skipped", "1")
+
+    assert err.value.code != 0

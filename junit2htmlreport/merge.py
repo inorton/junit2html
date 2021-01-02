@@ -18,10 +18,6 @@ def has_xml_header(filepath):
     """
     return True
 
-    with open(filepath, "r") as infile:
-        first = infile.read(1)
-        return first == '<'
-
 
 class Merger(ReportContainer, parser.ToJunitXmlBase):
     """

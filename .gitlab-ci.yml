@@ -37,4 +37,5 @@ coverage:
   image: python:3.9
   script:
     - pip install pytest pytest-cov
+    - pip install -e .
     - python3 -m pytest --cov-fail-under=86 --cov=junit2htmlreport  .
