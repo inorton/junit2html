@@ -492,6 +492,7 @@ class Junit(object):
         populate the report from the xml
         :return:
         """
+        testrun = False
         suites = None
         if isinstance(self.tree, ET.ElementTree):
             root = self.tree.getroot()
@@ -499,12 +500,13 @@ class Junit(object):
             root = self.tree
 
         if root.tag == "testrun":
+            testrun = True
             root = root[0]
 
         if root.tag == "testsuite":
             suites = [root]
 
-        if root.tag == "testsuites":
+        if root.tag == "testsuites" or testrun:
             suites = [x for x in root]
 
         if suites is None:

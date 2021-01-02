@@ -108,12 +108,10 @@ class ReportMatrix(ReportContainer):
         if PASSED in results:
             if FAILED in results:
                 return self.short_outcome(PARTIAL_FAIL), PARTIAL_FAIL.title()
-            if SKIPPED in results:
-                return self.short_outcome(PARTIAL_PASS), PARTIAL_PASS.title()
             return self.short_outcome(PASSED), PASSED.title()
 
         if FAILED in results:
-            return self.short_outcome(TOTAL_FAIL), TOTAL_FAIL.title()
+            return self.short_outcome(FAILED), FAILED.title()
         if SKIPPED in results:
             return self.short_outcome(UNTESTED), UNTESTED.title()
         return " ", ""
@@ -136,6 +134,8 @@ class HtmlReportMatrix(ReportMatrix):
         basename = os.path.basename(filename)
         # make the individual report too
         report = self.reports[basename].html()
+        if not os.path.exists(self.outdir):
+            os.makedirs(self.outdir)
         with open(
                 os.path.join(self.outdir, basename) + ".html", "w") as filehandle:
             filehandle.write(report)

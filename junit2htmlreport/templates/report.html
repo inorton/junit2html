@@ -4,19 +4,38 @@
     Test Report : {{ report.title }}
 </h1>
 <a id="toc"></a>
-<ul class="toc">
-    {% for suite in report %}
-        {% for classname in suite.classes %}
-        <li>{{classname}}
-        <ul>
-            {% for test in suite.classes[classname].cases %}
-            <li><a href="#{{test.anchor()}}">{{test.prefix()}} {{test.name}}</a></li>
+<table class="index-table">
+    <tr>
+        <td>
+            <ul class="toc">
+            {% for suite in report %}
+                {% for classname in suite.classes %}
+                <li>{{classname}}
+                <ul>
+                    {% for test in suite.classes[classname].cases %}
+                    <li><a href="#{{test.anchor()}}">{{test.name}}</a></li>
+                    {% endfor %}
+                </ul>
+                </li>
+                {% endfor %}
             {% endfor %}
-        </ul>
-        </li>
-        {% endfor %}
-    {% endfor %}
-</ul>
+            </ul>
+        </td>
+        <td class="failure-index">
+            <ul class="toc">
+            {% for suite in report %}
+                {% for classname in suite.classes %}
+                    {% for test in suite.classes[classname].cases %}
+                    {% if test.failed() %}
+                    <li><a href="#{{test.anchor()}}">{{test.prefix()}} {{test.fullname()}}</a></li>
+                    {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+            </ul>
+        </td>
+    </tr>
+</table>
 
 {% for suite in report %}
     <div class="testsuite">
@@ -47,7 +66,6 @@
                 <th>Failures</th><td>{{suite.failed()| length}}</td>
             </tr>
         </table>
-
 
         <div class="testclasses">
             <h3>Tests</h3>
@@ -86,15 +104,17 @@
                             {% endfor %}
                         </table>
                         {% endif %}
-                        {% if test.stderr or test.stdout %}
+                        {% if test.stdout %}
                         <div class="stdout"><i>Stdout</i><br>
                             <pre>{{test.stdout}}</pre>
                         </div>
+                        {% endif %}
+                        {% if test.stderr %}
                         <div class="stderr"><i>Stderr</i><br>
                             <pre>{{test.stderr}}</pre>
                         </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 {% endfor %}
                 </div>
             </div>

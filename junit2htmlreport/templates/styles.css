@@ -26,6 +26,7 @@ h1 {
 
 .testsuite {
     padding-bottom: 2em;
+    margin-left: 1em;
 }
 
 .proplist {
@@ -45,6 +46,20 @@ h1 {
 
 .proplist td {
     padding: 2px;
+}
+
+.index-table {
+    width: 90%;
+    margin-left: 1em;
+}
+
+.index-table td {
+    vertical-align: top;
+    width: 50%;
+}
+
+.failure-index {
+
 }
 
 .toc {
@@ -139,7 +154,12 @@ h1 {
     text-align: center;
     padding: 1mm;
     margin: 0;
-    background-color: silver;
+}
+
+.matrix-result-combined {
+    white-space: nowrap;
+    padding-right: 0.2em;
+    text-align: right;
 }
 
 .matrix-result-failed {

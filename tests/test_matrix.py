@@ -16,16 +16,16 @@ def test_combined_result():
     textmatrix = matrix.TextReportMatrix()
     short, result = textmatrix.combined_result([PASSED, SKIPPED])
 
-    assert short == textmatrix.short_outcome(PARTIAL_PASS)
-    assert result == PARTIAL_PASS.title()
+    assert short == textmatrix.short_outcome(PASSED)
+    assert result == PASSED.title()
 
     short, result = textmatrix.combined_result([PASSED, FAILED])
     assert short == textmatrix.short_outcome(PARTIAL_FAIL)
     assert result == PARTIAL_FAIL.title()
 
     short, result = textmatrix.combined_result([FAILED, FAILED])
-    assert short == textmatrix.short_outcome(TOTAL_FAIL)
-    assert result == TOTAL_FAIL.title()
+    assert short == textmatrix.short_outcome(FAILED)
+    assert result == FAILED.title()
 
     short, result = textmatrix.combined_result([PASSED])
     assert short == textmatrix.short_outcome(PASSED)
@@ -67,11 +67,6 @@ def test_matrix_html(tmpdir):
     htmatrix.add_report(get_filepath("junit-unicode.xml"))
     htmatrix.add_report(get_filepath("junit-axis-linux.xml"))
     assert len(htmatrix.reports) == 4
-
     result = htmatrix.summary()
-
-    with open(os.path.join(HERE, "test_matrix.html"), "w") as mf:
-        mf.write(result)
-
     assert result.endswith("</html>")
 
