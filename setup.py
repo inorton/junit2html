@@ -2,13 +2,13 @@ import os
 from setuptools import setup
 
 
-files = ["*.css",
+files = [os.path.join("templates", "*.css"),
          os.path.join("templates", "*.html")]
 
 
 setup(
     name="junit2html",
-    version="30.0.1",
+    version="30.0.2",
     description="Generate HTML reports from Junit results",
     author="Ian Norton",
     author_email="inorton@gmail.com",
