@@ -7,6 +7,7 @@
 <table class="matrix-table">
     {% set report_names = matrix.report_order() %}
     {% set n_reports = report_names.__len__() %}
+    {% if n_reports > 0 %}
     <tr><!-- top row, stats and each matrix axis -->
         <td colspan="2" rowspan="{{n_reports + 1}}"> <!-- stats -->
             <table class="stats-table">
@@ -23,6 +24,7 @@
             <a href="{{report_names[0]}}.html">{{matrix.short_axis(report_names[0])}}</a>
         </td>
     </tr>
+    {% endif %}
     <!-- matrix column index - {{report_names}} -->
     {% for i in range(n_reports - 1) %}
     <tr>
