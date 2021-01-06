@@ -134,7 +134,7 @@ class HtmlReportMatrix(ReportMatrix):
         basename = os.path.basename(filename)
         # make the individual report too
         report = self.reports[basename].html()
-        if not os.path.exists(self.outdir):
+        if self.outdir != "" and not os.path.exists(self.outdir):
             os.makedirs(self.outdir)
         with open(
                 os.path.join(self.outdir, basename) + ".html", "w") as filehandle:
