@@ -120,6 +120,12 @@ def test_parser():
     assert len(junit.suites[0].classes) == 1
 
 
+def test_binary_names():
+    # a test with nonsense binary in the case names
+    junit = parser.Junit(filename=get_filepath("pytest-binary-names.xml"))
+    assert junit
+
+
 def test_parser_stringreader():
     """
     Test the junit parser when reading strings

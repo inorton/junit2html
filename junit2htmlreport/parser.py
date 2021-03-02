@@ -19,6 +19,23 @@ PASSED = "passed"  # the test completed successfully
 ABSENT = "absent"  # the test was known but not run/failed/skipped
 
 
+def clean_xml_attribute(element, attribute, default=None):
+    """
+    Get an XML attribute value and ensure it is legal in XML
+    :param element:
+    :param attribute:
+    :param default:
+    :return:
+    """
+
+    value = element.attrib.get(attribute, default)
+    if value:
+        value = value.encode("utf-8", errors="replace").decode("utf-8", errors="backslashreplace")
+        value = value.replace(u"\ufffd", "?")  # strip out the unicode replacement char
+
+    return value
+
+
 class ParserError(Exception):
     """
     We had a problem parsing a file
@@ -355,10 +372,9 @@ class Junit(object):
             suitecount += 1
             cursuite = Suite()
             self.suites.append(cursuite)
-            suitename = suite.attrib.get("name", "suite-" + str(suitecount))
-            cursuite.name = suitename
-            if "package" in suite.attrib:
-                cursuite.package = suite.attrib["package"]
+            cursuite.name = clean_xml_attribute(suite, "name", default="suite-" + str(suitecount))
+            cursuite.package = clean_xml_attribute(suite, "package")
+
             cursuite.duration = float(suite.attrib.get("time", '0').replace(',', '') or '0')
 
             for element in suite:
@@ -396,9 +412,9 @@ class Junit(object):
 
                     testclass = cursuite[testcase.attrib["classname"]]
                     newcase = Case()
-                    newcase.name = testcase.attrib["name"]
+                    newcase.name = clean_xml_attribute(testcase, "name")
                     newcase.testclass = testclass
-                    newcase.duration = float(testcase.attrib.get("time", '0').replace(',','') or '0')
+                    newcase.duration = float(testcase.attrib.get("time", '0').replace(',', '') or '0')
                     testclass.cases.append(newcase)
 
                     # does this test case have any children?
