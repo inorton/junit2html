@@ -137,8 +137,8 @@ class HtmlReportMatrix(ReportMatrix):
         if self.outdir != "" and not os.path.exists(self.outdir):
             os.makedirs(self.outdir)
         with open(
-                os.path.join(self.outdir, basename) + ".html", "w") as filehandle:
-            filehandle.write(report)
+                os.path.join(self.outdir, basename) + ".html", "wb") as filehandle:
+            filehandle.write(report.encode("utf-8"))
 
     def short_outcome(self, outcome):
         if outcome == PASSED:
