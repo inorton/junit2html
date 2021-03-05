@@ -174,3 +174,7 @@ h1 {
 .matrix-result-skipped {
     background-color: lightyellow;
 }
+
+.matrix-even {
+    background-color: lightgray;
+}

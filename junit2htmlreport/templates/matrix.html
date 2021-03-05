@@ -25,17 +25,17 @@
     <!-- matrix column index - {{report_names}} -->
     {% for i in range(n_reports) %}
     <tr>
-        <td colspan="{{n_reports + 1 - i}}" class="matrix-axis-name">
+        <td colspan="{{n_reports + 1 - i}}" class="matrix-axis-name {% if (n_reports - i) % 2 == 0 %}matrix-even{% endif %}">
             <a href="{{report_names[n_reports - 1 - i]}}.html">{{matrix.short_axis(report_names[n_reports - 1 - i])}}</a>
         </td>
         {% for n in range(i) %}
-        <td class="matrix-axis-line"></td>
+        <td class="matrix-axis-line {% if (n_reports - n) % 2 != i % 2 %}matrix-even{% endif %}"></td>
         {% endfor %}
     </tr>
     {% endfor %}
     <tr>
-        {% for n in range(n_reports) %}
-        <td class="matrix-axis-line"></td>
+        {% for n in range(n_reports + 2) %}
+        <td class="matrix-axis-line {% if n % 2 == 1 %}matrix-even{% endif %}"></td>
         {% endfor %}
     </tr>
 
@@ -44,7 +44,7 @@
     <tr>
         <th class="matrix-classname" colspan="2">{{classname}}</th>
         {% for n in range(n_reports) %}
-        <td class="matrix-axis-line"></td>
+        <td class="matrix-axis-line {% if n % 2 == 1 %}matrix-even{% endif %}"></td>
         {% endfor %}
     </tr>
     {% for casename in matrix.casenames[classname] %}
@@ -54,9 +54,10 @@
         <td class="matrix-casename matrix-result-combined">
             {{ matrix.combined_result(matrix.case_results[classname][casename])[1] }}
         </td>
-        {% for axis in report_names %}
+        {% for n in range(n_reports) %}
+        {% set axis = report_names[n] %}
 
-        <td class="matrix-axis-line">
+        <td class="matrix-axis-line {% if n % 2 == 1 %}matrix-even{% endif %}">
             {% if axis in xcase %}
             <a href="{{axis}}.html#{{xcase[axis].anchor()}}">
                         <span class="matrix-result matrix-result-{{xcase[axis].outcome()}}">
