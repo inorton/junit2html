@@ -123,9 +123,10 @@ h1 {
 
 .matrix-axis-name {
     white-space: nowrap;
-    padding-left: 0.5em;
+    padding-right: 0.5em;
     border-left: 1px solid black;
     border-top: 1px solid black;
+    text-align: right;
 }
 
 .matrix-axis-line {
