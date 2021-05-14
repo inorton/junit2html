@@ -121,6 +121,10 @@ h1 {
     width: 0;
 }
 
+.matrix-table tr:hover {
+    background-color: yellow;
+}
+
 .matrix-axis-name {
     white-space: nowrap;
     padding-left: 0.5em;
