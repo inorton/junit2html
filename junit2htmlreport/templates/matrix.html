@@ -55,7 +55,7 @@
     <tr>
         <th class="matrix-casename">{{casename}}</th>
         <td class="matrix-casename matrix-result-combined">
-            {{ matrix.combined_result(matrix.case_results[classname][casename])[1] }}
+            {{ matrix.combined_result_list(classname, casename)[1] }}
         </td>
         {% for axis in report_names %}
 

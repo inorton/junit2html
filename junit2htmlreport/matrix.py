@@ -76,15 +76,15 @@ class ReportMatrix(ReportContainer):
                 self.classes[testclass][filename] = suite.classes[testclass]
 
                 for testcase in self.classes[testclass][filename].cases:
-                    basename = testcase.basename().strip()
-                    if basename not in self.casenames[testclass]:
-                        self.casenames[testclass].append(basename)
+                    name = testcase.name.strip()
+                    if name not in self.casenames[testclass]:
+                        self.casenames[testclass].append(name)
 
                     if testclass not in self.cases:
                         self.cases[testclass] = {}
-                    if basename not in self.cases[testclass]:
-                        self.cases[testclass][basename] = {}
-                    self.cases[testclass][basename][filename] = testcase
+                    if name not in self.cases[testclass]:
+                        self.cases[testclass][name] = {}
+                    self.cases[testclass][name][filename] = testcase
 
                     outcome = testcase.outcome()
                     self.add_case_result(testcase)
@@ -99,21 +99,36 @@ class ReportMatrix(ReportContainer):
         """
         raise NotImplementedError()
 
+    def combined_result_list(self, classname, casename):
+        """
+        Combone the result of all instances of the given case
+        :param classname:
+        :param casename:
+        :return:
+        """
+        if classname in self.case_results:
+            if casename in self.case_results[classname]:
+                results = self.case_results[classname][casename]
+                return self.combined_result(results)
+
+        return " ", ""
+
     def combined_result(self, results):
         """
         Given a list of results, produce a "combined" overall result
         :param results:
         :return:
         """
-        if PASSED in results:
-            if FAILED in results:
-                return self.short_outcome(PARTIAL_FAIL), PARTIAL_FAIL.title()
-            return self.short_outcome(PASSED), PASSED.title()
+        if results:
+            if PASSED in results:
+                if FAILED in results:
+                    return self.short_outcome(PARTIAL_FAIL), PARTIAL_FAIL.title()
+                return self.short_outcome(PASSED), PASSED.title()
 
-        if FAILED in results:
-            return self.short_outcome(FAILED), FAILED.title()
-        if SKIPPED in results:
-            return self.short_outcome(UNTESTED), UNTESTED.title()
+            if FAILED in results:
+                return self.short_outcome(FAILED), FAILED.title()
+            if SKIPPED in results:
+                return self.short_outcome(UNTESTED), UNTESTED.title()
         return " ", ""
 
 
