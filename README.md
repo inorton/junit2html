@@ -57,7 +57,7 @@ You can see junit2html's own test report output content at:
 https://gitlab.com/inorton/junit2html/-/jobs/artifacts/master/browse?job=python36
 
 An an example of the "matrix" report output can be found at:
-https://gitlab.com/inorton/junit2html/-/jobs/artifacts/master/file/junit2htmlreport/tests/matrix-example.html?job=python36
+https://gitlab.com/inorton/junit2html/-/jobs/artifacts/master/file/tests/matrix-example.html?job=python39
 
 
 About Junit
