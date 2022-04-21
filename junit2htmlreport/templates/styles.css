@@ -90,6 +90,14 @@ h1 {
     border-left: 1em solid lightcoral;
 }
 
+.outcome-passed {
+    border-left: 1em solid lightgreen;
+}
+
+.outcome-skipped {
+    border-left: 1em solid lightyellow;
+}
+
 .stats-table {
 }
 
