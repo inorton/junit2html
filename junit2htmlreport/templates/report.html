@@ -57,7 +57,7 @@
         <h3>Results</h3>
         <table class="proplist">
             <tr>
-                <th>Duration</th><td>{{suite.duration |round(1)}} sec</td>
+                <th>Duration</th><td>{{suite.duration |round(3)}} sec</td>
             </tr>
             <tr>
                 <th>Tests</th><td>{{suite.all() |length}}</td>
@@ -79,7 +79,7 @@
                         <table class="proplist">
                             <tr><th>Test case:</th><td><b>{{test.name}}</b></td></tr>
                             <tr><th>Outcome:</th><td>{{test.outcome().title()}}</td></tr>
-                            <tr><th>Duration:</th><td>{{test.duration|round(1)}} sec</td></tr>
+                            <tr><th>Duration:</th><td>{{test.duration|round(3)}} sec</td></tr>
                         {% if test.failed %}
                             <tr><th>Failed</th><td>{{test.failure_msg}}</td></tr>
                         {% endif %}
