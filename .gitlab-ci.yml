@@ -1,39 +1,28 @@
-.common:
+python38:
   before_script:
-    - pip install pytest wheel
+  - pip install pytest wheel
   script:
-    - python -m pip install -e .
-    - python -m pytest -v . --junitxml=junit2html-job-${CI_JOB_NAME}.xml
-    - python -m junit2htmlreport junit2html-job-${CI_JOB_NAME}.xml
-    - python -m junit2htmlreport --report-matrix tests/matrix-example.html tests/junit-axis-linux.xml tests/junit-axis-solaris.xml tests/junit-axis-windows.xml
-    - python -m junit2htmlreport --merge junit2html-merged-example.xml tests/junit-unicode.xml tests/junit-unicode2.xml tests/junit-cute2.xml
-    - python -m junit2htmlreport junit2html-merged-example.xml
-    - python setup.py bdist_wheel
+  - python -m pip install -e .
+  - python -m pytest -v . --junitxml=junit2html-job-${CI_JOB_NAME}.xml
+  - python -m junit2htmlreport junit2html-job-${CI_JOB_NAME}.xml
+  - python -m junit2htmlreport --report-matrix tests/matrix-example.html tests/junit-axis-linux.xml
+    tests/junit-axis-solaris.xml tests/junit-axis-windows.xml
+  - python -m junit2htmlreport --merge junit2html-merged-example.xml tests/junit-unicode.xml
+    tests/junit-unicode2.xml tests/junit-cute2.xml
+  - python -m junit2htmlreport junit2html-merged-example.xml
+  - python setup.py bdist_wheel
   artifacts:
     paths:
-      - junit2html*.xml*
-      - tests/*.html
-      - dist/*.whl
+    - junit2html*.xml*
+    - tests/*.html
+    - dist/*.whl
     reports:
       junit:
-        - junit2html-job-*.xml
-
-
-python36:
-  image: python:3.6
-  extends: .common
-
-python38:
+      - junit2html-job-*.xml
   image: python:3.8
-  extends: .common
-
-python39:
-  image: python:3.9
-  extends: .common
-
-coverage:
-  image: python:3.9
-  script:
-    - pip install pytest pytest-cov
-    - pip install -e .
-    - python3 -m pytest --cov-fail-under=86 --cov=junit2htmlreport  .
+  variables: {}
+  stage: test
+stages:
+- test
+variables: {}
+default: {}
