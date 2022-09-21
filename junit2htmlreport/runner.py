@@ -3,6 +3,7 @@ Small command line tool to generate a html version of a junit report file
 """
 import os
 from argparse import ArgumentParser
+from multipledispatch import dispatch
 import sys
 from junit2htmlreport import parser, matrix, merge
 
@@ -100,6 +101,11 @@ def start():
     """
     run(sys.argv[1:])
 
+def start(args):
+    """
+    Run using args as a function param instead of using the current shell command line sys.argv
+    """
+    run(args)
 
 if __name__ == "__main__":
     start()
