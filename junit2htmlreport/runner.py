@@ -94,16 +94,19 @@ def run(args):
         with open(outfilename, "wb") as outfile:
             outfile.write(html.encode('utf-8'))
 
-
+@dispatch()
 def start():
     """
     Run using the current sys.argv
     """
     run(sys.argv[1:])
 
+@dispatch(list)
 def start(args):
     """
     Run using args as a function param instead of using the current shell command line sys.argv
+    Keyword arguments:
+    args -- list of strings
     """
     run(args)
 
