@@ -1,9 +1,6 @@
-h1 {
-    font-family: sans-serif;
-}
-h2 {
-    font-family: sans-serif;
-}
+body { font-family:Avenir Next, Helvetica Neue, sans-serif; color: #4A4A4A; background-color: #F0F3FB; margin:0;}
+h1 { font-weight: normal; font-size: 24px; margin: 10px 0 0 0;}
+h3 { font-weight: normal; margin: 2px; font-size: 1.1em;}
 
 li > a {
     font-family: monospace;

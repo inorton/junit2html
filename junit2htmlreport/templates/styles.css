@@ -1,20 +1,46 @@
-body {
-    background-color: white;
-    padding-bottom: 20em;
-    margin: 0;
-    min-height: 15cm;
-}
+body { font-family:Avenir Next, Helvetica Neue, sans-serif; color: #4A4A4A; background-color: #F0F3FB; margin:0;}
+h1 { font-weight: normal; font-size: 24px; margin: 10px 0 0 0;}
 
-h1, h2, h3, h4, h5, h6, h7 {
+h4 { font-weight: normal; margin: 2px; font-size: 1.1em;}
+
+h4, h5, h6, h7 {
     font-family: sans-serif;
 }
 
 h1 {
-    background-color: #007acc;
     color: white;
     padding: 3mm;
     margin-top: 0;
     margin-bottom: 1mm;
+}
+
+table { width:100%; }
+
+tr td:first-child { width:7%; }
+
+header { 
+    position: sticky;
+    top: 0;
+    width: 100%;
+    background: #007acc;
+    margin: 0;
+    padding: 10px;
+}
+
+header:before, header:after { content:""; display:table;}
+
+header:after { clear:both;}
+
+.left { 
+    float: left; 
+    margin-left:30px;
+}
+
+.right { 
+    float: right; 
+    margin-right: 40px; 
+    margin-top: 0; 
+    margin-bottom:0;
 }
 
 .footer {
@@ -26,12 +52,68 @@ h1 {
 
 .testsuite {
     padding-bottom: 2em;
+    padding: 1em;
     margin-left: 1em;
 }
 
+.testsuite > div {
+    padding-left: 2em;
+}
+
+.testsuite > a {
+    padding-left: 2em;
+}
+
+.testsuite-results-passed .proplist {
+    border-color: #B8E986; 
+}
+
+.testsuite-results-failed .proplist {
+    border-color: #E7A1AA; 
+}
+
+.testresults > div {
+    padding-left: 1em;
+}
+
+.testclass > section.header > h4 {
+    padding: 10px;
+    margin: 20px 20px 0px 10px;
+    border-width: 1px;
+}
+
+.testclass-passed > section.header {
+    border-color: #A1D761; 
+    background-color: #B8E986; 
+}
+
+.testclass-failed > section.header {
+    border-color: #E7A1AA; 
+    background-color: #E7A1AA; 
+    border-left: 1em solid lightcoral;
+}
+
+.testsuite-results-passed .proplist th {
+    background-color: #CAF59F;
+}
+
+.testsuite-results-failed .proplist th {
+    background-color: #E7A1AA;
+}
+
+.testsuite-passed > section.testsuite-header {
+    border-left: 1em solid #CAF59F;
+    padding-left: 1em;
+}
+
+.testsuite-failed > section.testsuite-header {
+    border-left: 1em solid lightcoral;
+    padding-left: 1em;
+}
+
+
 .proplist {
     width: 100%;
-    margin-bottom: 2em;
     border-collapse: collapse;
     border: 1px solid grey;
 }
@@ -44,8 +126,8 @@ h1 {
     text-align: left;
 }
 
-.proplist td {
-    padding: 2px;
+.index h2 {
+    padding-left: 1em;
 }
 
 .index-table {
@@ -82,11 +164,19 @@ h1 {
 }
 
 .outcome {
-    border-left: 1em;
     padding: 2px;
+    float: left;
+    margin: 4px 10px 0 20px;
+}
+
+.outcome-passed {
+    background-color: #CAF59F;
+    border-color: #A1D761;
 }
 
 .outcome-failed {
+    background-color: #E7A1AA;
+    border-color: #E7A1AA;
     border-left: 1em solid lightcoral;
 }
 
@@ -181,4 +271,65 @@ h1 {
 
 .matrix-even {
     background-color: lightgray;
+}
+
+
+#segment-bar { 
+    margin-top: 10px;
+    margin-left: 14px;
+    float:right;
+}
+
+#segment-bar a:first-child { 
+    border-radius: 9px 0 0 9px;
+}
+
+#segment-bar a:last-child { 
+    border-radius: 0 9px 9px 0; 
+}
+
+#segment-bar > a { 
+    color: #ffffff; 
+    border: 2px solid  #ffffff; 
+    width: 80px; 
+    font-weight: bold; 
+    display:inline-block;
+    text-align:center; 
+    font-weight: normal;
+}
+
+#segment-bar > a.selected { 
+    background-color: #ffffff; 
+    color: #000000;
+}
+
+#counters { 
+    float: left;
+    margin: 10px;
+    text-align: right;
+    color: #ffffff;
+}
+
+#counters h2 { 
+    font-size: 20px; 
+    font-family: Avenir, sans-serif; 
+    font-weight: lighter; 
+    display:inline;
+}
+
+#counters .number { 
+    font-size: 20px;
+}
+
+#fail-count { 
+    color: #ff001e; 
+    margin-left:10px;
+}
+
+@media (max-width: 640px) {
+    h1, #counters, #segment-bar { margin: 5px auto; text-align:center;}
+    header, #segment-bar { width: 100%; position: relative; background:none;}
+    .left, .right { float:none; margin:0;}
+    #test-suites { margin-top: 0;}
+    #counters { float:none;}
 }

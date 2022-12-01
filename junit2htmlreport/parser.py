@@ -101,6 +101,9 @@ class Class(AnchorBase):
         self.name = None
         self.cases = list()
 
+    def failed(self):
+        return [test for test in self.cases if test.failed()]
+
 
 class Property(AnchorBase, ToJunitXmlBase):
     """
