@@ -165,12 +165,12 @@ class HtmlReportMatrix(ReportMatrix):
             return axis[:-4]
         return axis
 
-    def summary(self):
+    def summary(self, template=None):
         """
         Render the html
         :return:
         """
-        html_matrix = HTMLMatrix(self)
+        html_matrix = HTMLMatrix(self, template)
 
         return str(html_matrix)
 

@@ -28,6 +28,9 @@ PARSER.add_argument("--merge", dest="merge_output", type=str,
                     metavar="NEWREPORT",
                     help="Merge multiple test results into one file")
 
+PARSER.add_argument("--reports-template-folder", dest="template_folder", type=str,
+                    help="Render reports with these templates")
+
 PARSER.add_argument("REPORTS", metavar="REPORT", type=str, nargs="+",
                     help="Test file to read")
 
@@ -62,7 +65,7 @@ def run(args):
         for filename in inputs:
             util.add_report(filename)
         with open(opts.html_matrix, "w") as outfile:
-            outfile.write(util.summary())
+            outfile.write(util.summary(opts.template_folder))
 
     if util:
         if opts.fail:

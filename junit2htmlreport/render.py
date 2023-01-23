@@ -1,7 +1,7 @@
 """
 Render junit reports as HTML
 """
-from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Environment, PackageLoader, select_autoescape, FileSystemLoader
 
 
 class HTMLReport(object):
@@ -27,13 +27,18 @@ class HTMLReport(object):
 
 
 class HTMLMatrix(object):
-    def __init__(self, matrix):
+    def __init__(self, matrix, template=None):
         self.title = "JUnit Matrix"
         self.matrix = matrix
+        self.template = template
 
     def __str__(self) -> str:
+        if self.template:
+            loader = FileSystemLoader(self.template)
+        else:
+            loader = PackageLoader("junit2htmlreport", "templates")
         env = Environment(
-            loader=PackageLoader("junit2htmlreport", "templates"),
+            loader=loader,
             autoescape=select_autoescape(["html"])
         )
 
