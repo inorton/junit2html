@@ -80,7 +80,7 @@
                             <tr><th>Test case:</th><td><b>{{test.name}}</b></td></tr>
                             <tr><th>Outcome:</th><td>{{test.outcome().title()}}</td></tr>
                             <tr><th>Duration:</th><td>{{test.duration|round(3)}} sec</td></tr>
-                        {% if test.failed %}
+                        {% if test.failed() %}
                             <tr><th>Failed</th><td>{{test.failure_msg}}</td></tr>
                         {% endif %}
                         {% if test.skipped %}
@@ -88,7 +88,7 @@
                         {% endif %}
                         </table>
 
-                        {% if test.failed %}
+                        {% if test.failed() %}
                         <pre>{{test.failure}}</pre>
                         {% endif %}
                         {% if test.skipped %}
