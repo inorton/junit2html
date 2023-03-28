@@ -13,7 +13,7 @@ setup(
     author="Ian Norton",
     author_email="inorton@gmail.com",
     url="https://gitlab.com/inorton/junit2html",
-    install_requires=["jinja2>=3.0"],
+    install_requires=["jinja2>=3.0", "lxml>=4.9.2"],
     packages=["junit2htmlreport"],
     package_data={"junit2htmlreport": files},
     entry_points={'console_scripts': ['junit2html=junit2htmlreport.runner:start']},

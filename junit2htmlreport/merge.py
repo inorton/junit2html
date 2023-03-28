@@ -7,7 +7,7 @@ from io import BytesIO
 from junit2htmlreport import parser
 from junit2htmlreport.common import ReportContainer
 from junit2htmlreport.textutils import unicode_str
-import xml.etree.ElementTree as ET
+from lxml import etree
 
 
 def has_xml_header(filepath):
@@ -84,7 +84,8 @@ class Merger(ReportContainer, parser.ToJunitXmlBase):
         Render the xml document as a string
         :return:
         """
-        tree = ET.ElementTree(self.tojunit())
+        parser = etree.XMLParser(recover=True)
+        tree = etree.parse(self.tojunit(), parser=parser)
         buf = BytesIO()
         tree.write(buf)
         return u'<?xml version="1.0" encoding="utf-8"?>' + u"\n" + unicode_str(buf.getvalue())
