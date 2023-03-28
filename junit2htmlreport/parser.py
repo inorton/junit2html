@@ -4,7 +4,7 @@ Parse a junit report file into a family of objects
 from __future__ import unicode_literals
 
 import os
-import xml.etree.ElementTree as ET
+from lxml import etree
 import collections
 from .textutils import unicode_str
 from .render import HTMLReport
@@ -63,7 +63,7 @@ class ToJunitXmlBase(object):
         :param attribs: dict of xml attributes
         :return:
         """
-        element = ET.Element(unicode_str(xmltag))
+        element = etree.Element(xmltag.encode('utf-8'))
         if text is not None:
             element.text = unicode_str(text)
         if attribs is not None:
@@ -327,7 +327,9 @@ class Junit(object):
         self.filename = filename
         self.tree = None
         if filename is not None:
-            self.tree = ET.parse(filename)
+            parser = etree.XMLParser(recover=True)
+
+            self.tree = etree.parse(filename, parser=parser)
         elif xmlstring is not None:
             self._read(xmlstring)
         else:
@@ -344,7 +346,7 @@ class Junit(object):
         :param xmlstring:
         :return:
         """
-        self.tree = ET.fromstring(xmlstring)
+        self.tree = etree.fromstring(xmlstring)
 
     def process(self):
         """
@@ -353,11 +355,12 @@ class Junit(object):
         """
         testrun = False
         suites = None
-        if isinstance(self.tree, ET.ElementTree):
+        if etree.iselement(self.tree):
             root = self.tree.getroot()
         else:
             root = self.tree
 
+        root = self.tree.getroot()
         if root.tag == "testrun":
             testrun = True
             root = root[0]
@@ -433,7 +436,7 @@ class Junit(object):
                         elif child.tag == "system-err":
                             newcase.stderr = child.text
                         elif child.tag == "failure":
-                            newcase.failure = child.text
+                            newcase.failure = self.extract_text(child)
                             if "message" in child.attrib:
                                 newcase.failure_msg = child.attrib["message"]
                             if not newcase.failure:
@@ -460,3 +463,11 @@ class Junit(object):
         doc = HTMLReport()
         doc.load(self, os.path.basename(self.filename))
         return str(doc)
+
+    def extract_text(self, elem):
+        text = elem.text or ''
+        for child in elem:
+            text += self.extract_text(child)
+            if child.tail:
+                text += child.tail
+        return text
