@@ -317,6 +317,7 @@ class Junit(object):
     """
     Parse a single junit xml report
     """
+    BRANCH = 'branch not defined'
 
     def __init__(self, filename=None, xmlstring=None):
         """
@@ -369,6 +370,8 @@ class Junit(object):
             suites = [root]
 
         if root.tag == "testsuites" or testrun:
+            if root.get('branch') is not None:
+                self.BRANCH = root.get('branch')
             suites = [x for x in root]
 
         if suites is None:
@@ -461,7 +464,7 @@ class Junit(object):
         """
 
         doc = HTMLReport()
-        doc.load(self, os.path.basename(self.filename))
+        doc.load(self, self.BRANCH)
         return str(doc)
 
     def extract_text(self, elem):
