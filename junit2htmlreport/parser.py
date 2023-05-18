@@ -58,7 +58,7 @@ class ToJunitXmlBase(object):
     """
     Base class of all objects that can be serialized to Junit XML
     """
-    def tojunit(self) -> Any:
+    def tojunit(self) -> ET.Element:
         """
         Return an Element matching this object
         :return:

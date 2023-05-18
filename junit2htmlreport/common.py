@@ -17,7 +17,7 @@ class ReportContainer(object):
     def __init__(self):
         self.reports = {}
 
-    def add_report(self, filename: str) -> Any:
+    def add_report(self, filename: str) -> None:
         raise NotImplementedError()
 
     def failures(self):
