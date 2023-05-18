@@ -10,6 +10,7 @@ import collections
 import os
 import uuid
 import xml.etree.ElementTree as ET
+from enum import Enum
 from typing import Any, OrderedDict
 
 from .render import HTMLReport
@@ -17,10 +18,15 @@ from .textutils import unicode_str
 
 NO_CLASSNAME = "no-testclass"
 
-FAILED = "failed"  # the test failed
-SKIPPED = "skipped"  # the test was skipped
-PASSED = "passed"  # the test completed successfully
-ABSENT = "absent"  # the test was known but not run/failed/skipped
+class TestResult(str, Enum):
+    UNTESTED = "untested"
+    PARTIAL_PASS = "partial pass"
+    PARTIAL_FAIL = "partial failure"
+    TOTAL_FAIL = "total failure"
+    FAILED = "failed"  # the test failed
+    SKIPPED = "skipped"  # the test was skipped
+    PASSED = "passed"  # the test completed successfully
+    ABSENT = "absent"  # the test was known but not run/failed/skipped
 
 
 def clean_xml_attribute(element: ET.Element, attribute: str, default: str|None=None):
@@ -153,16 +159,16 @@ class Case(AnchorBase, ToJunitXmlBase):
             return "[s]"
         return ""
 
-    def outcome(self):
+    def outcome(self) -> TestResult:
         """
         Return the result of this test case
         :return:
         """
         if self.skipped:
-            return SKIPPED
+            return TestResult.SKIPPED
         elif self.failed():
-            return FAILED
-        return PASSED
+            return TestResult.FAILED
+        return TestResult.PASSED
 
     def prefix(self):
         if self.skipped:
