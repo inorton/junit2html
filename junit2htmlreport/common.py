@@ -3,9 +3,7 @@ Common code between JUnit2HTML matrix and merge classes
 """
 from __future__ import print_function
 
-from typing import Any
-
-from junit2htmlreport.parser import Case, Junit
+from .parser import Case, Junit
 
 
 class ReportContainer(object):

@@ -5,7 +5,7 @@ import os
 import sys
 from argparse import ArgumentParser
 
-from junit2htmlreport import matrix, merge, parser
+from . import matrix, merge, parser
 
 PARSER = ArgumentParser(prog="junit2html")
 

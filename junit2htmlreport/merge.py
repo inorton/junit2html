@@ -7,9 +7,9 @@ import os
 import xml.etree.ElementTree as ET
 from io import BytesIO
 
-from junit2htmlreport import parser
-from junit2htmlreport.common import ReportContainer
-from junit2htmlreport.textutils import unicode_str
+from . import parser
+from .common import ReportContainer
+from .textutils import unicode_str
 
 
 def has_xml_header(filepath: str):
