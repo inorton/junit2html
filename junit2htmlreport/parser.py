@@ -10,23 +10,13 @@ import collections
 import os
 import uuid
 import xml.etree.ElementTree as ET
-from enum import Enum
 from typing import Any, OrderedDict
 
+from .case_result import CaseResult
 from .render import HTMLReport
 from .textutils import unicode_str
 
 NO_CLASSNAME = "no-testclass"
-
-class CaseResult(str, Enum):
-    UNTESTED = "untested"
-    PARTIAL_PASS = "partial pass"
-    PARTIAL_FAIL = "partial failure"
-    TOTAL_FAIL = "total failure"
-    FAILED = "failed"  # the test failed
-    SKIPPED = "skipped"  # the test was skipped
-    PASSED = "passed"  # the test completed successfully
-    ABSENT = "absent"  # the test was known but not run/failed/skipped
 
 
 def clean_xml_attribute(element: ET.Element, attribute: str, default: str|None=None):

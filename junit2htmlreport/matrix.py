@@ -4,22 +4,24 @@ Handle multiple parsed junit reports
 from __future__ import unicode_literals
 
 import os
-from enum import Enum
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Literal
+
+if TYPE_CHECKING:
+    from .parser import Case, Class
 
 from . import parser
+from .case_result import CaseResult
 from .common import ReportContainer
-from .parser import Case, CaseResult, Class
-from .render import HTMLMatrix, HTMLReport
+from .render import HTMLMatrix
 
 
 class ReportMatrix(ReportContainer):
     """
     Load and handle several report files
     """
-    cases: dict[str, dict[str, dict[str, Case]]]
-    classes: dict[str, dict[str, Class]]
-    casenames: dict[str, list[str]]
+    cases: "dict[str, dict[str, dict[str, Case]]]"
+    classes: "dict[str, dict[str, Class]]"
+    casenames: "dict[str, list[str]]"
     result_stats: dict[CaseResult, int]
     case_results: dict[str, dict[str, list[CaseResult]]]
 
@@ -31,7 +33,7 @@ class ReportMatrix(ReportContainer):
         self.result_stats = {}
         self.case_results = {}
 
-    def add_case_result(self, case: Case):
+    def add_case_result(self, case: "Case"):
         if case.testclass is None or case.testclass.name is None:
             testclass = ""
         else:
@@ -228,7 +230,7 @@ class TextReportMatrix(ReportMatrix):
 
                 # print each test and its result for each axis
                 case_data = ""
-                testcase: Case|None = None
+                testcase: "Case|None" = None
                 for axis in self.report_order():
                     if axis not in self.cases[classname][casename]:
                         case_data += "  "
