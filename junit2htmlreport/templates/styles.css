@@ -82,14 +82,15 @@ h1 {
     margin-left: 0.5cm;
 }
 
-.outcome {
+.testcases .outcome {
     border-left: 1em;
     padding: 2px;
 }
 
-.outcome-failed {
+.testcases .outcome-failed {
     border-left: 1em solid lightcoral;
 }
+
 
 .outcome-passed {
     border-left: 1em solid lightgreen;
@@ -98,6 +99,11 @@ h1 {
 .outcome-skipped {
     border-left: 1em dotted silver;
 }
+
+.testcases .outcome-passed {
+    border-left: 1em solid lightgreen;
+}
+
 
 .stats-table {
 }
