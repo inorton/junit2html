@@ -18,7 +18,7 @@ from .textutils import unicode_str
 
 NO_CLASSNAME = "no-testclass"
 
-class TestResult(str, Enum):
+class CaseResult(str, Enum):
     UNTESTED = "untested"
     PARTIAL_PASS = "partial pass"
     PARTIAL_FAIL = "partial failure"
@@ -159,16 +159,16 @@ class Case(AnchorBase, ToJunitXmlBase):
             return "[s]"
         return ""
 
-    def outcome(self) -> TestResult:
+    def outcome(self) -> CaseResult:
         """
         Return the result of this test case
         :return:
         """
         if self.skipped:
-            return TestResult.SKIPPED
+            return CaseResult.SKIPPED
         elif self.failed():
-            return TestResult.FAILED
-        return TestResult.PASSED
+            return CaseResult.FAILED
+        return CaseResult.PASSED
 
     def prefix(self):
         if self.skipped:
