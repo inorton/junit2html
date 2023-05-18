@@ -10,3 +10,6 @@ class CaseResult(str, Enum):
     SKIPPED = "skipped"  # the test was skipped
     PASSED = "passed"  # the test completed successfully
     ABSENT = "absent"  # the test was known but not run/failed/skipped
+
+    def __str__(self) -> str:
+        return self.value
