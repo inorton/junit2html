@@ -21,7 +21,7 @@ tr td:first-child { width:7%; }
 header { 
     position: sticky;
     top: 0;
-    width: 100%;
+    box-sizing: border-box;
     background: #007acc;
     margin: 0;
     padding: 10px;
@@ -161,6 +161,7 @@ header:after { clear:both;}
 
 .test {
     margin-left: 0.5cm;
+    width: calc(100% - 1cm);
 }
 
 .outcome {
@@ -273,6 +274,14 @@ header:after { clear:both;}
     background-color: lightgray;
 }
 
+td.test-proplist {
+    padding-left: 1em;
+}
+
+th.test-proplist-name {
+    text-align: center;
+}
+
 
 #segment-bar { 
     margin-top: 10px;
@@ -321,8 +330,8 @@ header:after { clear:both;}
     font-size: 20px;
 }
 
-#fail-count { 
-    color: #ff001e; 
+#fail-count {
+    color: #ff001e;
     margin-left:10px;
 }
 

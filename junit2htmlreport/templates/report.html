@@ -43,15 +43,12 @@
             <section class="testsuite-header" onclick=toggleTests(this);><h2>Test Suite: {{ suite.name }}</h2></section>
             <section>
                 <a id="{{ suite.anchor() }}"></a>
-                {% if suite.package %}
-                <span>Package: {{suite.package}}</span>
-                {% endif %}
                 {% if suite.properties %}
                 <h3>Suite Properties</h3>
                 <table class="proplist">
                     {% for prop in suite.properties %}
                     <tr>
-                        <th>{{prop.name}}</th><td>{{prop.value}}</td>
+                        <th class="test-proplist-name">{{prop.name}}</th><td class="test-proplist">{{prop.value|safe}}</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -115,7 +112,7 @@
                                                 <table class="proplist">
                                                     {% for prop in test.properties %}
                                                     <tr>
-                                                        <th>{{prop.name}}</th><td>{{prop.value}}</td>
+                                                        <th class="test-proplist-name">{{prop.name}}</th><td class="test-proplist">{{prop.value}}</td>
                                                     </tr>
                                                     {% endfor %}
                                                 </table>
