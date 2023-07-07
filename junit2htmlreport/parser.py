@@ -9,6 +9,7 @@ import collections
 from .textutils import unicode_str
 from .render import HTMLReport
 import uuid
+from datetime import datetime
 
 
 NO_CLASSNAME = "no-testclass"
@@ -382,7 +383,15 @@ class Junit(object):
             cursuite = Suite()
             self.suites.append(cursuite)
             cursuite.name = clean_xml_attribute(suite, "name", default="suite-" + str(suitecount))
-            cursuite.package = clean_xml_attribute(suite, "package")
+            if clean_xml_attribute(suite, "timestamp") is not None:
+                timestamp = clean_xml_attribute(suite, "timestamp")
+                dt = datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%fZ')
+                formatted_timestamp = dt.strftime('%d-%m-%Y %H:%M:%S')
+                cursuite.properties.append({"name": "Time", "value": formatted_timestamp})
+            if clean_xml_attribute(suite, "device_1") is not None or clean_xml_attribute(suite, "device") is not None:
+                cursuite.properties.append({"name": "Device 1", "value": "<a target=_blank href=" + (clean_xml_attribute(suite, "link_1") or clean_xml_attribute(suite, "link") or '') + ">" + (clean_xml_attribute(suite, "device_1") or clean_xml_attribute(suite, "device")) + "</a>"})
+            if clean_xml_attribute(suite, "device_2") is not None:
+                cursuite.properties.append({"name": "Device 2", "value": "<a target=_blank href=" + (clean_xml_attribute(suite, "link_2") or '') + ">" + clean_xml_attribute(suite, "device_2") + "</a>"})
 
             cursuite.duration = float(suite.attrib.get("time", '0').replace(',', '') or '0')
 
@@ -424,6 +433,8 @@ class Junit(object):
                     newcase.name = clean_xml_attribute(testcase, "name")
                     newcase.testclass = testclass
                     newcase.duration = float(testcase.attrib.get("time", '0').replace(',', '') or '0')
+                    if clean_xml_attribute(testcase, "tries") is not None:
+                        newcase.properties.append({"name": "Tries", "value": clean_xml_attribute(testcase, "tries")})
                     testclass.cases.append(newcase)
 
                     # does this test case have any children?
