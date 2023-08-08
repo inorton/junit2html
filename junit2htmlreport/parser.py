@@ -14,6 +14,7 @@ from datetime import datetime
 
 NO_CLASSNAME = "no-testclass"
 
+ABORTED = "aborted"  # the test was aborted
 FAILED = "failed"  # the test failed
 SKIPPED = "skipped"  # the test was skipped
 PASSED = "passed"  # the test completed successfully
@@ -105,6 +106,12 @@ class Class(AnchorBase):
     def failed(self):
         return [test for test in self.cases if test.failed()]
 
+    def aborted(self):
+        return [test for test in self.cases if test.aborted]
+
+    def isAborted(self):
+        return all(test.aborted for test in self.cases)
+
 
 class Property(AnchorBase, ToJunitXmlBase):
     """
@@ -137,6 +144,8 @@ class Case(AnchorBase, ToJunitXmlBase):
         self.failure_msg = None
         self.skipped = False
         self.skipped_msg = None
+        self.aborted = False
+        self.aborted_msg = None
         self.stderr = None
         self.stdout = None
         self.duration = 0
@@ -151,6 +160,8 @@ class Case(AnchorBase, ToJunitXmlBase):
         """
         if self.skipped:
             return SKIPPED
+        elif self.aborted:
+            return ABORTED
         elif self.failed():
             return FAILED
         return PASSED
@@ -158,6 +169,8 @@ class Case(AnchorBase, ToJunitXmlBase):
     def prefix(self):
         if self.skipped:
             return "[S]"
+        if self.aborted:
+            return "[B]"
         if self.failed():
             return "[F]"
         return ""
@@ -190,6 +203,13 @@ class Case(AnchorBase, ToJunitXmlBase):
                 "skipped", self.skipped,
                 {
                     "message": self.skipped_msg
+                }))
+
+        if self.aborted:
+            testcase.append(self.make_element(
+                "aborted", self.aborted,
+                {
+                    "message": self.aborted_msg
                 }))
 
         if self.properties:
@@ -306,12 +326,26 @@ class Suite(AnchorBase, ToJunitXmlBase):
         """
         return [test for test in self.all() if test.skipped]
 
+    def aborted(self):
+        """
+        Return all aborted testcases
+        :return:
+        """
+        return [test for test in self.all() if test.aborted]
+
+    def isAborted(self):
+        """
+        Return all aborted testcases
+        :return:
+        """
+        return all(test.aborted for test in self.all())
+
     def passed(self):
         """
         Return all the passing testcases
         :return:
         """
-        return [test for test in self.all() if not test.failed() and not test.skipped()]
+        return [test for test in self.all() if not test.failed() and not test.skipped() and not test.aborted()]
 
 
 class Junit(object):
@@ -445,6 +479,12 @@ class Junit(object):
                                 newcase.skipped_msg = child.attrib["message"]
                             if not newcase.skipped:
                                newcase.skipped = "skipped"
+                        if child.tag == "aborted":
+                            newcase.aborted = child.text
+                            if "message" in child.attrib:
+                                newcase.aborted_msg = child.attrib["message"]
+                            if not newcase.aborted:
+                               newcase.aborted = "aborted"
                         elif child.tag == "system-out":
                             newcase.stdout = child.text
                         elif child.tag == "system-err":

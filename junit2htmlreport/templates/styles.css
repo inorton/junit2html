@@ -72,6 +72,10 @@ header:after { clear:both;}
     border-color: #E7A1AA; 
 }
 
+.testsuite-results-aborted .proplist {
+    border-color: black;
+}
+
 .testresults > div {
     padding-left: 1em;
 }
@@ -93,12 +97,23 @@ header:after { clear:both;}
     border-left: 1em solid lightcoral;
 }
 
+.testclass-aborted > section.header {
+    border-color: black;
+    background-color: black;
+    color: white;
+}
+
 .testsuite-results-passed .proplist th {
     background-color: #CAF59F;
 }
 
 .testsuite-results-failed .proplist th {
     background-color: #E7A1AA;
+}
+
+.testsuite-results-aborted .proplist th {
+    background-color: black;
+    color: white;
 }
 
 .testsuite-passed > section.testsuite-header {
@@ -108,6 +123,11 @@ header:after { clear:both;}
 
 .testsuite-failed > section.testsuite-header {
     border-left: 1em solid lightcoral;
+    padding-left: 1em;
+}
+
+.testsuite-aborted > section.testsuite-header {
+    border-left: 1em solid black;
     padding-left: 1em;
 }
 
@@ -154,7 +174,19 @@ header:after { clear:both;}
     background-color: #1e1e1e;
     color: silver;
     padding: 0.5em;
+    white-space: normal;
+    width: calc(100% - 1em);
 }
+
+.stdio, .pre-aborted {
+    min-height: 1em;
+    background-color: silver;
+    color: #1e1e1e;
+    padding: 0.5em;
+    white-space: normal;
+    width: calc(100% - 1em);
+}
+
 .tdpre {
     background-color: #1e1e1e;
 }
@@ -179,6 +211,13 @@ header:after { clear:both;}
     background-color: #E7A1AA;
     border-color: #E7A1AA;
     border-left: 1em solid lightcoral;
+    width: calc(100% - 1cm - 1em);
+}
+
+.outcome-aborted {
+    background-color: #000000;
+    border-color: #000000;
+    color: silver;
 }
 
 .stats-table {
@@ -280,6 +319,7 @@ td.test-proplist {
 
 th.test-proplist-name {
     text-align: center;
+    color: #4A4A4A;
 }
 
 
@@ -332,6 +372,11 @@ th.test-proplist-name {
 
 #fail-count {
     color: #ff001e;
+    margin-left:10px;
+}
+
+#aborted-count {
+    color: #000000;
     margin-left:10px;
 }
 

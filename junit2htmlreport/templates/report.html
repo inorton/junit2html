@@ -23,11 +23,19 @@
                 {% endfor %}
                 {{tests | sum}}
             </span> failures</h2>
+            <h2 id="aborted-count"><span class="number">
+                {% set tests = [] %}
+                {% for suite in report %}
+                    {%if tests.append(suite.aborted() | length) %}{% endif %}
+                {% endfor %}
+                {{tests | sum}}
+            </span> aborted</h2>
 
         </section>
         <section id="segment-bar">
             <a id="all-segment" onclick="selectSegment(this);" class="selected">All</a>
             <a id="failing-segment" onclick="selectSegment(this);">Failing</a>
+            <a id="aborting-segment" onclick="selectSegment(this);">Aborting</a>
             <a id="passing-segment" onclick="selectSegment(this);">Passing</a>
         </section>
     </section>
@@ -37,6 +45,8 @@
     {% for suite in report %}
         {% if suite.failed() %}
         <div class="testsuite testsuite-failed">
+        {% elif suite.isAborted() %}
+        <div class="testsuite testsuite-aborted">
         {% else %}
         <div class="testsuite testsuite-passed">
         {% endif %}
@@ -57,6 +67,8 @@
                     <h3>Results</h3>
                     {% if suite.failed() %}
                     <div class="testsuite-results-failed">
+                    {% elif suite.isAborted() %}
+                    <div class="testsuite-results-aborted">
                     {% else %}
                     <div class="testsuite-results-passed">
                     {% endif %}
@@ -70,15 +82,20 @@
                             <tr>
                                 <th>Failures</th><td>{{suite.failed()| length}}</td>
                             </tr>
+                            <tr>
+                                <th>Aborted</th><td>{{suite.aborted()| length}}</td>
+                            </tr>
                         </table>
                     </div>
                 </div>
-    
+
                 <div class="testclasses">
                     <h3>Tests</h3>
                     {% for classname in suite.classes %}
                     {% if suite.classes[classname].failed() %}
                     <div class="testclass testclass-failed">
+                    {% elif suite.classes[classname].isAborted() %}
+                    <div class="testclass testclass-aborted">
                     {% else %}
                     <div class="testclass testclass-passed">
                     {% endif %}
@@ -98,15 +115,23 @@
                                             {% if test.skipped %}
                                             <tr><td colspan="2">Skipped </td></tr>
                                             {% endif %}
-                
+
+                                            {% if test.aborted %}
+                                            <tr><td colspan="2">Aborted </td></tr>
+                                            {% endif %}
+
                                             {% if test.failed() %}
                                             <tr><td colspan="2"><pre>{{test.failure}}</pre> </td></tr>
                                             {% endif %}
-    
+
                                             {% if test.skipped %}
                                             <tr><td colspan="2"><pre>{{test.skipped}}</pre> </td></tr>
                                             {% endif %}
-                
+
+                                            {% if test.aborted %}
+                                            <tr><td colspan="2"><pre class="pre-aborted">{{test.aborted}}</pre> </td></tr>
+                                            {% endif %}
+
                                             {% if test.properties %}
                                             <tr><td colspan="2">
                                                 <table class="proplist">
