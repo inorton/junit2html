@@ -95,7 +95,7 @@ h1 {
 }
 
 .outcome-skipped {
-    border-left: 1em solid lightyellow;
+    border-left: 1em dotted silver;
 }
 
 .stats-table {

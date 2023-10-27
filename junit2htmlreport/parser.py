@@ -141,6 +141,12 @@ class Case(AnchorBase, ToJunitXmlBase):
         self.testclass = None
         self.properties = list()
 
+    @property
+    def display_suffix(self):
+        if self.skipped:
+            return "[s]"
+        return ""
+
     def outcome(self):
         """
         Return the result of this test case
