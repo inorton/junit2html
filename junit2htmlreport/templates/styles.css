@@ -55,7 +55,8 @@ h1 {
 
 .index-table td {
     vertical-align: top;
-    width: 50%;
+    max-width: 200px;
+    word-wrap: break-word;
 }
 
 .failure-index {
