@@ -46,6 +46,7 @@ h1 {
 
 .proplist td {
     padding: 2px;
+    word-break: break-all;
 }
 
 .index-table {
