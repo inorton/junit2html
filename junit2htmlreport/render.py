@@ -5,9 +5,10 @@ from jinja2 import Environment, PackageLoader, select_autoescape, FileSystemLoad
 
 
 class HTMLReport(object):
-    def __init__(self):
+    def __init__(self, show_toc=True):
         self.title = ""
         self.report = None
+        self.show_toc = show_toc
 
     def load(self, report, title="JUnit2HTML Report"):
         self.report = report
@@ -23,7 +24,7 @@ class HTMLReport(object):
         )
 
         template = env.get_template("report.html")
-        return template.render(report=self, title=self.title)
+        return template.render(report=self, title=self.title, show_toc=self.show_toc)
 
 
 class HTMLMatrix(object):

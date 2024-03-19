@@ -3,6 +3,8 @@
 <h1>
     Test Report : {{ report.title }}
 </h1>
+
+{% if show_toc %}
 <a id="toc"></a>
 <table class="index-table">
     <tr>
@@ -36,6 +38,7 @@
         </td>
     </tr>
 </table>
+{% endif %}
 
 {% for suite in report %}
     <div class="testsuite">

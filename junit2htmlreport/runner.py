@@ -31,6 +31,10 @@ PARSER.add_argument("--merge", dest="merge_output", type=str,
 PARSER.add_argument("--reports-template-folder", dest="template_folder", type=str,
                     help="Render reports with these templates")
 
+PARSER.add_argument("--hide-toc", dest="hide_toc", action="store_true",
+                    default=False,
+                    help="Don't include a table-of-contents in the HTML report")
+
 PARSER.add_argument("REPORTS", metavar="REPORT", type=str, nargs="+",
                     help="Test file to read")
 
@@ -63,7 +67,7 @@ def run(args):
     elif opts.html_matrix:
         util = matrix.HtmlReportMatrix(os.path.dirname(opts.html_matrix))
         for filename in inputs:
-            util.add_report(filename)
+            util.add_report(filename, show_toc=not opts.hide_toc)
         with open(opts.html_matrix, "w") as outfile:
             outfile.write(util.summary(opts.template_folder))
 
@@ -85,13 +89,15 @@ def run(args):
             PARSER.print_usage()
             sys.exit(1)
 
+        infilename = opts.REPORTS[0]
+
         if len(opts.REPORTS) == 2:
             outfilename = opts.REPORTS[1]
         else:
-            outfilename = opts.REPORTS[0] + ".html"
+            outfilename = infilename + ".html"
 
-        report = parser.Junit(args[0])
-        html = report.html()
+        report = parser.Junit(infilename)
+        html = report.html(show_toc=not opts.hide_toc)
         if report.filename is not None:
             with open(outfilename, "wb") as outfile:
                 outfile.write(html.encode('utf-8'))

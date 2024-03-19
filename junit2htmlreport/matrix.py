@@ -141,14 +141,14 @@ class HtmlReportMatrix(ReportMatrix):
         super(HtmlReportMatrix, self).__init__()
         self.outdir = outdir
 
-    def add_report(self, filename):
+    def add_report(self, filename, show_toc=True):
         """
         Load a report
         """
         super(HtmlReportMatrix, self).add_report(filename)
         basename = os.path.basename(filename)
         # make the individual report too
-        report = self.reports[basename].html()
+        report = self.reports[basename].html(show_toc=show_toc)
         if self.outdir != "" and not os.path.exists(self.outdir):
             os.makedirs(self.outdir)
         with open(
