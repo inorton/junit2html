@@ -7,20 +7,19 @@ import os
 import sys
 import xml.etree.ElementTree as ET
 import collections
-from .textutils import unicode_str
-from .render import HTMLReport
+import os
 import uuid
+import xml.etree.ElementTree as ET
+from typing import Any, OrderedDict
 
+from .case_result import CaseResult
+from .render import HTMLReport
+from .textutils import unicode_str
 
 NO_CLASSNAME = "no-testclass"
 
-FAILED = "failed"  # the test failed
-SKIPPED = "skipped"  # the test was skipped
-PASSED = "passed"  # the test completed successfully
-ABSENT = "absent"  # the test was known but not run/failed/skipped
 
-
-def clean_xml_attribute(element, attribute, default=None):
+def clean_xml_attribute(element: ET.Element, attribute: str, default: str|None=None):
     """
     Get an XML attribute value and ensure it is legal in XML
     :param element:
@@ -41,7 +40,7 @@ class ParserError(Exception):
     """
     We had a problem parsing a file
     """
-    def __init__(self, message):
+    def __init__(self, message: str):
         super(ParserError, self).__init__(message)
 
 
@@ -49,14 +48,14 @@ class ToJunitXmlBase(object):
     """
     Base class of all objects that can be serialized to Junit XML
     """
-    def tojunit(self):
+    def tojunit(self) -> ET.Element:
         """
         Return an Element matching this object
         :return:
         """
         raise NotImplementedError()
 
-    def make_element(self, xmltag, text=None, attribs=None):
+    def make_element(self, xmltag: str, text: str|None=None, attribs: dict[str, Any]|None=None):
         """
         Create an Element and put text and/or attribs into it
         :param xmltag: tag name
@@ -97,10 +96,12 @@ class Class(AnchorBase):
     """
     A namespace for a test
     """
+    name: str|None = None
+    cases: "list[Case]"
+    
     def __init__(self):
         super(Class, self).__init__()
-        self.name = None
-        self.cases = list()
+        self.cases = []
 
 
 class Property(AnchorBase, ToJunitXmlBase):
@@ -109,8 +110,8 @@ class Property(AnchorBase, ToJunitXmlBase):
     """
     def __init__(self):
         super(Property, self).__init__()
-        self.name = None
-        self.value = None
+        self.name: str|None = None
+        self.value: str|None = None
 
     def tojunit(self):
         """
@@ -127,19 +128,20 @@ class Case(AnchorBase, ToJunitXmlBase):
     """
     Test cases
     """
+    failure: str|None = None
+    failure_msg: str|None = None
+    skipped: str|None = None
+    skipped_msg: str|None = None
+    stderr: str|Any|None = None
+    stdout: str|Any|None = None
+    duration: float = 0
+    name: str|None = None
+    testclass: Class|None = None
+    properties: list[Property]
 
     def __init__(self):
         super(Case, self).__init__()
-        self.failure = None
-        self.failure_msg = None
-        self.skipped = False
-        self.skipped_msg = None
-        self.stderr = None
-        self.stdout = None
-        self.duration = 0
-        self.name = None
-        self.testclass = None
-        self.properties = list()
+        self.properties = []
 
     @property
     def display_suffix(self):
@@ -147,16 +149,16 @@ class Case(AnchorBase, ToJunitXmlBase):
             return "[s]"
         return ""
 
-    def outcome(self):
+    def outcome(self) -> CaseResult:
         """
         Return the result of this test case
         :return:
         """
         if self.skipped:
-            return SKIPPED
+            return CaseResult.SKIPPED
         elif self.failed():
-            return FAILED
-        return PASSED
+            return CaseResult.FAILED
+        return CaseResult.PASSED
 
     def prefix(self):
         if self.skipped:
@@ -171,9 +173,14 @@ class Case(AnchorBase, ToJunitXmlBase):
         :note: this may not be the exact input we loaded
         :return:
         """
+        if self.testclass is None or self.testclass.name is None:
+            testclass_name = ""
+        else:
+            testclass_name = self.testclass.name
+
         testcase = self.make_element("testcase")
         testcase.set(u"name", unicode_str(self.name))
-        testcase.set(u"classname", unicode_str(self.testclass.name))
+        testcase.set(u"classname", unicode_str(testclass_name))
         testcase.set(u"time", unicode_str(self.duration))
 
         if self.stderr is not None:
@@ -208,13 +215,23 @@ class Case(AnchorBase, ToJunitXmlBase):
         Get the full name of a test case
         :return:
         """
-        return "{} : {}".format(self.testclass.name, self.name)
+        if self.testclass is None or self.testclass.name is None:
+            testclass_name = ""
+        else:
+            testclass_name = self.testclass.name
+        return "{} : {}".format(testclass_name, self.name)
 
     def basename(self):
         """
         Get a short name for this case
         :return:
         """
+        if (   self.name is None
+            or self.testclass is None
+            or self.testclass.name is None
+        ):
+            return None
+
         if self.name.startswith(self.testclass.name):
             return self.name[len(self.testclass.name):]
         return self.name
@@ -231,16 +248,20 @@ class Suite(AnchorBase, ToJunitXmlBase):
     """
     Contains test cases (usually only one suite per report)
     """
+    name: str|None = None
+    properties: list[Property]
+    classes: OrderedDict[str, Class]
+    duration: float = 0
+    package: str|None = None
+    errors: list[dict[str, str|Any|None]]
+    stdout: str|Any|None = None
+    stderr: str|Any|None = None
+
     def __init__(self):
         super(Suite, self).__init__()
-        self.name = None
-        self.duration = 0
         self.classes = collections.OrderedDict()
-        self.package = None
         self.properties = []
         self.errors = []
-        self.stdout = None
-        self.stderr = None
 
     def tojunit(self):
         """
@@ -260,7 +281,7 @@ class Suite(AnchorBase, ToJunitXmlBase):
             suite.append(testcase.tojunit())
         return suite
 
-    def __contains__(self, item):
+    def __contains__(self, item: str):
         """
         Return True if the given test classname is part of this test suite
         :param item:
@@ -268,7 +289,7 @@ class Suite(AnchorBase, ToJunitXmlBase):
         """
         return item in self.classes
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: str):
         """
         Return the given test class object
         :param item:
@@ -276,7 +297,7 @@ class Suite(AnchorBase, ToJunitXmlBase):
         """
         return self.classes[item]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: Class):
         """
         Add a test class
         :param key:
@@ -290,7 +311,7 @@ class Suite(AnchorBase, ToJunitXmlBase):
         Return all testcases
         :return:
         """
-        tests = list()
+        tests: list[Case] = []
         for testclass in self.classes:
             tests.extend(self.classes[testclass].cases)
         return tests
@@ -314,15 +335,18 @@ class Suite(AnchorBase, ToJunitXmlBase):
         Return all the passing testcases
         :return:
         """
-        return [test for test in self.all() if not test.failed() and not test.skipped()]
+        return [test for test in self.all() if not test.failed() and not test.skipped]
 
 
 class Junit(object):
     """
     Parse a single junit xml report
     """
+    filename: str
+    suites: list[Suite]
+    tree: ET.ElementTree|ET.Element
 
-    def __init__(self, filename=None, xmlstring=None):
+    def __init__(self, filename: str|None=None, xmlstring: str|None=None):
         """
         Parse the file
         :param filename:
@@ -338,23 +362,19 @@ class Junit(object):
         self.tree = None
         if self.filename is not None:
             self.tree = ET.parse(self.filename)
+
+        self.suites = []
+        if filename is not None:
+            self.filename = filename
+            self.tree = ET.parse(filename)
         elif xmlstring is not None:
-            self._read(xmlstring)
+            self.tree = ET.fromstring(xmlstring)
         else:
             raise ValueError("Missing any filename or xmlstring")
-        self.suites = []
         self.process()
 
     def __iter__(self):
         return self.suites.__iter__()
-
-    def _read(self, xmlstring):
-        """
-        Populate the junit xml document tree from a string
-        :param xmlstring:
-        :return:
-        """
-        self.tree = ET.fromstring(xmlstring)
 
     def process(self):
         """
@@ -362,7 +382,8 @@ class Junit(object):
         :return:
         """
         testrun = False
-        suites = None
+        suites: list[ET.Element]|None = None
+        root: ET.Element
         if isinstance(self.tree, ET.ElementTree):
             root = self.tree.getroot()
         else:
@@ -370,7 +391,7 @@ class Junit(object):
 
         if root.tag == "testrun":
             testrun = True
-            root = root[0]
+            root: ET.Element = root[0]
 
         if root.tag == "testsuite":
             suites = [root]
@@ -423,7 +444,7 @@ class Junit(object):
                         testclass.name = testcase.attrib["classname"]
                         cursuite[testclass.name] = testclass
 
-                    testclass = cursuite[testcase.attrib["classname"]]
+                    testclass: Class = cursuite[testcase.attrib["classname"]]
                     newcase = Case()
                     newcase.name = clean_xml_attribute(testcase, "name")
                     newcase.testclass = testclass

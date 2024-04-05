@@ -82,14 +82,49 @@ h1 {
     margin-left: 0.5cm;
 }
 
-.outcome {
+.toc {
+    list-style: none;
+}
+
+.toc li.outcome {
+    list-style: none;
+}
+
+.toc li.outcome::before {
+    content: "\2022";
+    color: black;
+    font-weight: bold;
+    display: inline-block;
+    width: 1.27em;
+    margin-left: -1.27em;
+    font-size: 1.2em;
+}
+
+.toc li.outcome-failed {
+    background-color: lightcoral;
+}
+
+.toc li.outcome-failed::before {
+    color: red;
+}
+
+.toc li.outcome-passed::before {
+    color: green;
+}
+
+.toc li.outcome-skipped::before {
+    color: orange;
+}
+
+.testcases .outcome {
     border-left: 1em;
     padding: 2px;
 }
 
-.outcome-failed {
+.testcases .outcome-failed {
     border-left: 1em solid lightcoral;
 }
+
 
 .outcome-passed {
     border-left: 1em solid lightgreen;
@@ -97,6 +132,14 @@ h1 {
 
 .outcome-skipped {
     border-left: 1em dotted silver;
+}
+
+.testcases .outcome-passed {
+    border-left: 1em solid lightgreen;
+}
+
+.testcases .outcome-skipped {
+    border-left: 1em solid #FED8B1;
 }
 
 .stats-table {

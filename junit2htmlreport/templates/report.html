@@ -13,7 +13,7 @@
                 <li>{{classname}}
                 <ul>
                     {% for test in suite.classes[classname].cases %}
-                    <li><a href="#{{test.anchor()}}">{{test.name}}</a>{{test.display_suffix}}</li>
+                    <li class="outcome outcome-{{test.outcome()}}"><a href="#{{test.anchor()}}">{{test.name}}</a>{{test.display_suffix}}</li>
                     {% endfor %}
                 </ul>
                 </li>

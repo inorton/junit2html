@@ -9,3 +9,5 @@ MANIFEST
 *.xml
 *.xml.html
 *.egg-info
+*.code-workspace
+*.egg-info
