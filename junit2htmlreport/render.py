@@ -1,20 +1,33 @@
 """
 Render junit reports as HTML
 """
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING: # pragma: no cover
+    from .matrix import ReportMatrix
+    from .parser import Junit
+    from os import PathLike
+    from typing import Union, Sequence, Optional
+
 from jinja2 import Environment, PackageLoader, select_autoescape, FileSystemLoader
 
 
 class HTMLReport(object):
-    def __init__(self, show_toc=True):
-        self.title = ""
-        self.report = None
+    title: str = ""
+    report: "Optional[Junit]" = None
+    show_toc: bool = True
+
+    def __init__(self, show_toc: bool=True):
         self.show_toc = show_toc
 
-    def load(self, report, title="JUnit2HTML Report"):
+    def load(self, report: "Junit", title: str="JUnit2HTML Report"):
         self.report = report
         self.title = title
 
     def __iter__(self):
+        if self.report is None:
+            raise Exception("A report must be loaded through `load(...)` first.")
+
         return self.report.__iter__()
 
     def __str__(self) -> str:
@@ -28,8 +41,11 @@ class HTMLReport(object):
 
 
 class HTMLMatrix(object):
-    def __init__(self, matrix, template=None):
-        self.title = "JUnit Matrix"
+    title: str = "JUnit Matrix"
+    matrix: "ReportMatrix"
+    template: "Optional[Union[str,PathLike[str],Sequence[Union[str,PathLike[str]]]]]"
+
+    def __init__(self, matrix: "ReportMatrix", template:"Optional[Union[str,PathLike[str],Sequence[Union[str,PathLike[str]]]]]"=None):
         self.matrix = matrix
         self.template = template
 

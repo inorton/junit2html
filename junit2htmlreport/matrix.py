@@ -2,22 +2,29 @@
 Handle multiple parsed junit reports
 """
 from __future__ import unicode_literals
-import os
-from . import parser
-from .common import ReportContainer
-from .parser import SKIPPED, FAILED, PASSED, ABSENT
-from .render import HTMLMatrix, HTMLReport
 
-UNTESTED = "untested"
-PARTIAL_PASS = "partial pass"
-PARTIAL_FAIL = "partial failure"
-TOTAL_FAIL = "total failure"
+import os
+from typing import TYPE_CHECKING
+
+from . import parser
+from .case_result import CaseResult
+from .common import ReportContainer
+from .render import HTMLMatrix
+
+if TYPE_CHECKING: # pragma: no cover
+    from .parser import Case, Class
+    from typing import Dict, List, Optional, Any, Literal
 
 
 class ReportMatrix(ReportContainer):
     """
     Load and handle several report files
     """
+    cases: "Dict[str, Dict[str, Dict[str, Case]]]"
+    classes: "Dict[str, Dict[str, Class]]"
+    casenames: "Dict[str, List[str]]"
+    result_stats: "Dict[CaseResult, int]"
+    case_results: "Dict[str, Dict[str, List[CaseResult]]]"
 
     def __init__(self):
         super(ReportMatrix, self).__init__()
@@ -27,9 +34,12 @@ class ReportMatrix(ReportContainer):
         self.result_stats = {}
         self.case_results = {}
 
-    def add_case_result(self, case):
-        testclass = case.testclass.name
-        casename = case.name
+    def add_case_result(self, case: "Case"):
+        if case.testclass is None or case.testclass.name is None:
+            testclass = ""
+        else:
+            testclass = case.testclass.name
+        casename = "" if case.name is None else case.name
         if testclass not in self.case_results:
             self.case_results[testclass] = {}
         if casename not in self.case_results[testclass]:
@@ -39,25 +49,25 @@ class ReportMatrix(ReportContainer):
     def report_order(self):
         return sorted(self.reports.keys())
 
-    def short_outcome(self, outcome):
-        if outcome == PASSED:
+    def short_outcome(self, outcome: CaseResult) -> "Literal['ok', '/', 's', 'f', 'F', '%', 'X', 'U', '?']":
+        if outcome == CaseResult.PASSED:
             return "/"
-        elif outcome == SKIPPED:
-            return "s"
-        elif outcome == FAILED:
+        elif outcome == CaseResult.SKIPPED: # pragma: no cover
+            return "s" # currently unused because SKIPPED returns UNTESTED
+        elif outcome == CaseResult.FAILED:
             return "f"
-        elif outcome == TOTAL_FAIL:
+        elif outcome == CaseResult.TOTAL_FAIL:
             return "F"
-        elif outcome == PARTIAL_PASS:
+        elif outcome == CaseResult.PARTIAL_PASS:
             return "%"
-        elif outcome == PARTIAL_FAIL:
+        elif outcome == CaseResult.PARTIAL_FAIL:
             return "X"
-        elif outcome == UNTESTED:
+        elif outcome == CaseResult.UNTESTED:
             return "U"
 
         return "?"
 
-    def add_report(self, filename):
+    def add_report(self, filename: str):
         """
         Load a report into the matrix
         :param filename:
@@ -76,7 +86,7 @@ class ReportMatrix(ReportContainer):
                 self.classes[testclass][filename] = suite.classes[testclass]
 
                 for testcase in self.classes[testclass][filename].cases:
-                    name = testcase.name.strip()
+                    name = "" if testcase.name is None else testcase.name.strip()
                     if name not in self.casenames[testclass]:
                         self.casenames[testclass].append(name)
 
@@ -92,14 +102,14 @@ class ReportMatrix(ReportContainer):
                     self.result_stats[outcome] = 1 + self.result_stats.get(
                         outcome, 0)
 
-    def summary(self):
+    def summary(self) -> str:
         """
         Render a summary of the matrix
         :return:
         """
         raise NotImplementedError()
 
-    def combined_result_list(self, classname, casename):
+    def combined_result_list(self, classname: str, casename: str):
         """
         Combone the result of all instances of the given case
         :param classname:
@@ -113,22 +123,26 @@ class ReportMatrix(ReportContainer):
 
         return " ", ""
 
-    def combined_result(self, results):
+    def combined_result(self, results: "List[CaseResult]"):
         """
         Given a list of results, produce a "combined" overall result
         :param results:
         :return:
         """
         if results:
-            if PASSED in results:
-                if FAILED in results:
-                    return self.short_outcome(PARTIAL_FAIL), PARTIAL_FAIL.title()
-                return self.short_outcome(PASSED), PASSED.title()
+            if CaseResult.PASSED in results:
+                if CaseResult.FAILED in results:
+                    return self.short_outcome(CaseResult.PARTIAL_FAIL), CaseResult.PARTIAL_FAIL.title()
+                return self.short_outcome(CaseResult.PASSED), CaseResult.PASSED.title()
 
-            if FAILED in results:
-                return self.short_outcome(FAILED), FAILED.title()
-            if SKIPPED in results:
-                return self.short_outcome(UNTESTED), UNTESTED.title()
+            if CaseResult.FAILED in results:
+                return self.short_outcome(CaseResult.FAILED), CaseResult.FAILED.title()
+            if CaseResult.SKIPPED in results:
+                return self.short_outcome(CaseResult.UNTESTED), CaseResult.UNTESTED.title()
+            if CaseResult.PARTIAL_PASS in results:
+                return self.short_outcome(CaseResult.PARTIAL_PASS), CaseResult.PARTIAL_PASS.title()
+            if CaseResult.TOTAL_FAIL in results:
+                return self.short_outcome(CaseResult.TOTAL_FAIL), CaseResult.TOTAL_FAIL.title()
         return " ", ""
 
 
@@ -137,11 +151,13 @@ class HtmlReportMatrix(ReportMatrix):
     Render a matrix report as html
     """
 
-    def __init__(self, outdir):
+    outdir: str
+
+    def __init__(self, outdir: str):
         super(HtmlReportMatrix, self).__init__()
         self.outdir = outdir
 
-    def add_report(self, filename, show_toc=True):
+    def add_report(self, filename: str, show_toc: bool=True):
         """
         Load a report
         """
@@ -155,17 +171,17 @@ class HtmlReportMatrix(ReportMatrix):
                 os.path.join(self.outdir, basename) + ".html", "wb") as filehandle:
             filehandle.write(report.encode("utf-8"))
 
-    def short_outcome(self, outcome):
-        if outcome == PASSED:
+    def short_outcome(self, outcome: CaseResult) -> "Literal['ok', '/', 's', 'f', 'F', '%', 'X', 'U', '?']":
+        if outcome == CaseResult.PASSED:
             return "ok"
         return super(HtmlReportMatrix, self).short_outcome(outcome)
 
-    def short_axis(self, axis):
+    def short_axis(self, axis: str):
         if axis.endswith(".xml"):
             return axis[:-4]
         return axis
 
-    def summary(self, template=None):
+    def summary(self, template: "Optional[Any]"=None):
         """
         Render the html
         :return:
@@ -219,6 +235,7 @@ class TextReportMatrix(ReportMatrix):
 
                 # print each test and its result for each axis
                 case_data = ""
+                testcase: "Optional[Case]" = None
                 for axis in self.report_order():
                     if axis not in self.cases[classname][casename]:
                         case_data += "  "
@@ -231,8 +248,12 @@ class TextReportMatrix(ReportMatrix):
                         else:
                             case_data += "/ "
 
+                if testcase is None or testcase.name is None:
+                    testcase_name = ""
+                else:
+                    testcase_name = testcase.name
                 combined, combined_name = self.combined_result(
-                    self.case_results[classname][testcase.name])
+                    self.case_results[classname][testcase_name])
 
                 output += case_data
                 output += " {} {}\n".format(combined, combined_name)

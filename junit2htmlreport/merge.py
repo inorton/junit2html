@@ -2,15 +2,22 @@
 Classes for merging several reports into one
 """
 from __future__ import unicode_literals
+
+from typing import TYPE_CHECKING
+
 import os
-from io import BytesIO
-from junit2htmlreport import parser
-from junit2htmlreport.common import ReportContainer
-from junit2htmlreport.textutils import unicode_str
 import xml.etree.ElementTree as ET
+from io import BytesIO
+
+from . import parser
+from .common import ReportContainer
+from .textutils import unicode_str
+
+if TYPE_CHECKING:
+    from typing import List
 
 
-def has_xml_header(filepath):
+def has_xml_header(filepath: str):
     """
     Return True if the first line of the file is <?xml
     :param filepath:
@@ -23,11 +30,13 @@ class Merger(ReportContainer, parser.ToJunitXmlBase):
     """
     Utility class to create a merged junix xml report
     """
+    suites: "List[parser.Suite]"
+
     def __init__(self):
         super(Merger, self).__init__()
         self.suites = []
 
-    def add_report(self, filename):
+    def add_report(self, filename: str):
         """
         Load a test report or folder
         :param filename:
@@ -49,7 +58,7 @@ class Merger(ReportContainer, parser.ToJunitXmlBase):
                         except (parser.ParserError, ET.ParseError):
                             pass
 
-    def add_suite(self, suite):
+    def add_suite(self, suite: "parser.Suite"):
         """
         Add a suite to the merge
         :param suite:

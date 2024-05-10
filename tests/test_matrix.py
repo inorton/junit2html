@@ -2,10 +2,11 @@
 Test the matrix functionality
 """
 import os
-from .inputfiles import get_filepath, HERE
+
 from junit2htmlreport import matrix
-from junit2htmlreport.matrix import PARTIAL_PASS, PARTIAL_FAIL, TOTAL_FAIL, UNTESTED
-from junit2htmlreport.parser import PASSED, SKIPPED, FAILED
+from junit2htmlreport.parser import CaseResult
+
+from .inputfiles import HERE, get_filepath
 
 
 def test_combined_result():
@@ -14,26 +15,38 @@ def test_combined_result():
     :return:
     """
     textmatrix = matrix.TextReportMatrix()
-    short, result = textmatrix.combined_result([PASSED, SKIPPED])
+    short, result = textmatrix.combined_result([CaseResult.PASSED, CaseResult.SKIPPED])
 
-    assert short == textmatrix.short_outcome(PASSED)
-    assert result == PASSED.title()
+    assert short == textmatrix.short_outcome(CaseResult.PASSED)
+    assert result == CaseResult.PASSED.title()
 
-    short, result = textmatrix.combined_result([PASSED, FAILED])
-    assert short == textmatrix.short_outcome(PARTIAL_FAIL)
-    assert result == PARTIAL_FAIL.title()
+    short, result = textmatrix.combined_result([CaseResult.PASSED, CaseResult.FAILED])
+    assert short == textmatrix.short_outcome(CaseResult.PARTIAL_FAIL)
+    assert result == CaseResult.PARTIAL_FAIL.title()
 
-    short, result = textmatrix.combined_result([FAILED, FAILED])
-    assert short == textmatrix.short_outcome(FAILED)
-    assert result == FAILED.title()
+    short, result = textmatrix.combined_result([CaseResult.PARTIAL_PASS])
+    assert short == textmatrix.short_outcome(CaseResult.PARTIAL_PASS)
+    assert result == CaseResult.PARTIAL_PASS.title()
 
-    short, result = textmatrix.combined_result([PASSED])
-    assert short == textmatrix.short_outcome(PASSED)
-    assert result == PASSED.title()
+    short, result = textmatrix.combined_result([CaseResult.TOTAL_FAIL])
+    assert short == textmatrix.short_outcome(CaseResult.TOTAL_FAIL)
+    assert result == CaseResult.TOTAL_FAIL.title()
 
-    short, result = textmatrix.combined_result([SKIPPED, SKIPPED])
-    assert short == textmatrix.short_outcome(UNTESTED)
-    assert result == UNTESTED.title()
+    short, result = textmatrix.combined_result([CaseResult.FAILED, CaseResult.FAILED])
+    assert short == textmatrix.short_outcome(CaseResult.FAILED)
+    assert result == CaseResult.FAILED.title()
+
+    short, result = textmatrix.combined_result([CaseResult.PASSED])
+    assert short == textmatrix.short_outcome(CaseResult.PASSED)
+    assert result == CaseResult.PASSED.title()
+
+    short, result = textmatrix.combined_result([CaseResult.SKIPPED, CaseResult.SKIPPED])
+    assert short == textmatrix.short_outcome(CaseResult.UNTESTED)
+    assert result == CaseResult.UNTESTED.title()
+
+    short, result = textmatrix.combined_result([])
+    assert '?' == textmatrix.short_outcome(None) # type: ignore
+    assert result == CaseResult.UNKNOWN.title()
 
 
 def test_matrix_load(tmpdir):

@@ -1,10 +1,16 @@
 """
 Small command line tool to generate a html version of a junit report file
 """
+from typing import TYPE_CHECKING
+
 import os
-from argparse import ArgumentParser
 import sys
-from junit2htmlreport import parser, matrix, merge
+from argparse import ArgumentParser
+
+from . import matrix, merge, parser
+
+if TYPE_CHECKING:
+    from typing import List
 
 PARSER = ArgumentParser(prog="junit2html")
 
@@ -42,7 +48,7 @@ PARSER.add_argument("OUTPUT", type=str, nargs="?",
                     help="Filename to save the html as")
 
 
-def run(args):
+def run(args: "List[str]"):
     """
     Run this tool
     :param args:
