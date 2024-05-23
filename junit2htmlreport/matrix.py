@@ -11,6 +11,12 @@ from .case_result import CaseResult
 from .common import ReportContainer
 from .render import HTMLMatrix
 
+UNTESTED = CaseResult.UNTESTED
+PARTIAL_PASS = CaseResult.PARTIAL_PASS
+PARTIAL_FAIL = CaseResult.PARTIAL_FAIL
+TOTAL_FAIL = CaseResult.TOTAL_FAIL
+
+
 if TYPE_CHECKING: # pragma: no cover
     from .parser import Case, Class
     from typing import Dict, List, Optional, Any, Literal

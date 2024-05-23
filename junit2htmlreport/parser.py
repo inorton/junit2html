@@ -19,6 +19,11 @@ if TYPE_CHECKING:
     from typing import Dict, List, Optional, Union, Any, OrderedDict
 
 NO_CLASSNAME = "no-testclass"
+PASSED = CaseResult.PASSED
+FAILED = CaseResult.FAILED
+SKIPPED = CaseResult.SKIPPED
+ABSENT = CaseResult.ABSENT
+UNKNOWN = CaseResult.UNKNOWN
 
 
 def clean_xml_attribute(element: "ET.Element", attribute: str, default: "Optional[str]"=None):
